@@ -4,9 +4,9 @@ import { Button, Typography, Row, Col, Card } from "antd";
 import { Container } from "react-bootstrap";
 import {
   ArrowRightOutlined,
-  ShoppingOutlined,
-  RocketOutlined,
-  SafetyOutlined,
+  SafetyCertificateOutlined,
+  AppstoreOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import "./LandingPage.css";
@@ -127,43 +127,43 @@ const LandingPage = () => {
                 style={{
                   textAlign: "center",
                   marginBottom: "3rem",
-                  color: "#000",
+                  color: "#5A827E",
                 }}
               >
-                Why Choose Us
+                Tại sao nên chọn mua hàng tại NutiGo ?
               </Title>
             </AnimatedSection>
             <Row gutter={[32, 32]}>
               {[
                 {
                   icon: (
-                    <ShoppingOutlined
-                      style={{ fontSize: "2.5rem", color: "#1890ff" }}
+                    <SafetyCertificateOutlined
+                      style={{ fontSize: "2.5rem", color: "#84AE92" }}
                     />
                   ),
-                  title: "Wide Selection",
+                  title: " 100% Tự nhiên",
                   description:
-                    "Browse through thousands of products from trusted sellers.",
+                    "Sản phẩm từ thiên nhiên, được chọn lọc kĩ lưỡng, đảm bảo an toàn cho sức khỏe. Nguyên dưỡng chất tự nhiên, lành mạnh và thân thiện.",
                 },
                 {
                   icon: (
-                    <RocketOutlined
-                      style={{ fontSize: "2.5rem", color: "#1890ff" }}
+                    <HeartOutlined
+                      style={{ fontSize: "2.5rem", color: "#84AE92" }}
                     />
                   ),
-                  title: "Fast Delivery",
+                  title: "Mẫu mã bắt mắt",
                   description:
-                    "Get your orders delivered quickly and efficiently.",
+                    "Chúng tôi luôn chăm chút để sản phẩm của mình giành trọn sự hài lòng từ khách hàng thông qua bao bì sản phẩm.",
                 },
                 {
                   icon: (
-                    <SafetyOutlined
-                      style={{ fontSize: "2.5rem", color: "#1890ff" }}
+                    <AppstoreOutlined
+                      style={{ fontSize: "2.5rem", color: "#84AE92" }}
                     />
                   ),
-                  title: "Secure Shopping",
+                  title: "Sản phẩm đa dạng",
                   description:
-                    "Shop with confidence with our secure payment system.",
+                    "Có trên 50 sản phẩm với hơn 20 loại thực phẩm dinh dưỡng được nhập khẩu từ nhiều nơi trên Thế Giới.",
                 },
               ].map((feature, index) => (
                 <Col xs={24} md={8} key={index}>
@@ -195,7 +195,7 @@ const LandingPage = () => {
           style={{
             padding: "100px 0",
             backgroundImage:
-              "url(https://placehold.co/1920x1080?text=CTA+Background)",
+              "url(https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=/data/editor/news%2F%40%40%40image202307050922515_1688523313475.png)",
             backgroundSize: "cover",
             backgroundPosition: "center",
             color: "white",
@@ -219,18 +219,23 @@ const LandingPage = () => {
                 <Col xs={24} md={16} style={{ textAlign: "center" }}>
                   <Title
                     level={2}
-                    style={{ color: "white", marginBottom: "1.5rem" }}
+                    style={{
+                      fontWeight: 400,
+                      fontSize: "2rem",
+                      color: "white",
+                      textShadow: "2px 2px 5px rgba(80, 40, 0, 0.8)",
+                    }}
                   >
-                    Ready to Start Shopping?
+                    Mua sắm ngay thôi nào!
                   </Title>
                   <Paragraph
-                    style={{ fontSize: "1.2rem", marginBottom: "2rem" }}
+                    style={{ fontSize: "1.2rem", color: "white" ,marginBottom: "2rem" }}
                   >
-                    Join thousands of satisfied customers and start your
-                    shopping journey today.
+                    Cùng hàng ngàn khách hàng tin tưởng, bắt đầu hành trình mua
+                    sắm tuyệt vời ngay hôm nay!
                   </Paragraph>
                   <Button type="primary" size="large" ghost>
-                    Sign Up Now
+                    Đăng ký ngay
                   </Button>
                 </Col>
               </Row>
