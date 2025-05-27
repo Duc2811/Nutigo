@@ -12,6 +12,7 @@ import { Image } from "antd";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import { useSelector } from "react-redux";
+import GoogleLoginButton from '../../Component/GoogleLoginButton';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -158,6 +159,11 @@ const Login = () => {
                   >
                     {t("Don't have an account? Sign Up")}
                   </Button>
+
+                  {/* Google Login Button */}
+                  <div className="form-group" style={{ marginTop: '16px' }}>
+                    <GoogleLoginButton />
+                  </div>
                 </Form>
               </Card.Body>
             </Card>

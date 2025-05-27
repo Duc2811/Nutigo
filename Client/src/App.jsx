@@ -87,6 +87,8 @@ import UserDiscount from "./Screen/Admin/discount/userDiscount";
 // import ShiperDashboard from "./Screen/Shiper/ShipperDashboard";
 import ShiperLayout from "./Screen/Shiper/ShiperLayout";
 
+import GoogleCallback from './Screen/Client/GoogleCallback';
+
 const App = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
   return (
@@ -210,6 +212,7 @@ const App = () => {
 
             <Route path="/luckywheel" element={<LuckyWheel />} />
             <Route path="/compare" element={<CompareProducts />} />
+            <Route path="/google-callback" element={<GoogleCallback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
