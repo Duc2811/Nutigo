@@ -1,13 +1,19 @@
-import { FacebookOutlined, GithubOutlined, GoogleOutlined, LinkedinOutlined, TwitterOutlined } from "@ant-design/icons";
+import {
+  FacebookOutlined,
+  GithubOutlined,
+  GoogleOutlined,
+  LinkedinOutlined,
+  TwitterOutlined,
+} from "@ant-design/icons";
 import { Layout, Row, Col, Typography, Space, Divider, Input } from "antd";
 import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";  
+import { useTranslation } from "react-i18next";
 
 const { Footer } = Layout;
 const { Title, Text } = Typography;
 
 const AppFooter = () => {
-  const { t } = useTranslation("footer"); 
+  const { t } = useTranslation("footer");
   const isDarkMode = useSelector((state) => state.user.darkMode) || false;
 
   const footerStyle = {
@@ -29,9 +35,7 @@ const AppFooter = () => {
           <Title level={4} style={{ color: textColor }}>
             {t("L-Shop")}
           </Title>
-          <Text style={{ color: textColor }}>
-            {t("L-Shop Description")}
-          </Text>
+          <Text style={{ color: textColor }}>{t("L-Shop Description")}</Text>
         </Col>
 
         <Col xs={24} sm={12} md={6}>
@@ -39,10 +43,10 @@ const AppFooter = () => {
             {t("Category")}
           </Title>
           <Space direction="vertical">
-            <Text style={{ color: textColor }}>📱 {t("Phone")}</Text>
-            <Text style={{ color: textColor }}>💻 {t("Laptop")}</Text>
-            <Text style={{ color: textColor }}>🎧 {t("Accessories")}</Text>
-            <Text style={{ color: textColor }}>⌚ {t("Smartwatch")}</Text>
+            <Text style={{ color: textColor }}> 🌰 {t("Phone")}</Text>
+            <Text style={{ color: textColor }}> 🥜 {t("Laptop")}</Text>
+            <Text style={{ color: textColor }}> 🫘 {t("Accessories")}</Text>
+            <Text style={{ color: textColor }}>🥣 {t("Smartwatch")}</Text>
           </Space>
         </Col>
 
@@ -52,12 +56,8 @@ const AppFooter = () => {
           </Title>
           <Space direction="vertical">
             <Text style={{ color: textColor }}>📞 {t("Hotline")}</Text>
-            <Text style={{ color: textColor }}>
-              📍 {t("Address")}
-            </Text>
-            <Text style={{ color: textColor }}>
-              📧 {t("Email")}
-            </Text>
+            <Text style={{ color: textColor }}>📍 {t("Address")}</Text>
+            <Text style={{ color: textColor }}>📧 {t("Email")}</Text>
           </Space>
         </Col>
 

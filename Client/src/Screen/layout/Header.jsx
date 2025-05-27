@@ -173,7 +173,9 @@ const Header = () => {
           alt={nameApp || "Logo"}
           style={{
             cursor: "pointer",
+            paddingTop:"15px",
             borderRadius: "8px",
+            width: '120px',
             transition: "transform 0.3s ease",
           }}
           onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
