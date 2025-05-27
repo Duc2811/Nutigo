@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'user', 'productManager', 'sale', 'shipper'],
         default: 'user'
     },
-    deletedAt: Date
+    deletedAt: Date,
+    googleId: { type: String, unique: true, sparse: true },
 },
     {
         timestamps: true
