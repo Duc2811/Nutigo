@@ -31,7 +31,7 @@ import { doLogout, doDarkMode } from "../../store/reducer/userReducer";
 import { toast } from "react-toastify"
 
 
-const DEFAULT_LOGO = "/L.png";
+const DEFAULT_LOGO = "/NutiGo.png";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const Header = () => {
 
   // Effects
   useEffect(() => {
-    document.title = nameApp || "L-Shop";
+    document.title = nameApp || "NutiGo";
     const iconLink = document.querySelector("link[rel='icon']");
     if (logo && iconLink) {
       iconLink.href = logo;
@@ -169,11 +169,13 @@ const Header = () => {
         <img
           onClick={() => navigate("/")}
           src={logo || DEFAULT_LOGO}
-          width={40}
+          width={80}
           alt={nameApp || "Logo"}
           style={{
             cursor: "pointer",
+            paddingTop:"15px",
             borderRadius: "8px",
+            width: '120px',
             transition: "transform 0.3s ease",
           }}
           onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
