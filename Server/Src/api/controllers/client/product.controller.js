@@ -505,21 +505,67 @@ module.exports.compareProducts = async (req, res) => {
             return res.status(404).json({ message: 'One or both products not found' });
         }
 
+        // Tính toán các chỉ số so sánh
         const betterProduct = {
-            price: product1.price < product2.price ? 'Sản phẩm 1 tốt hơn về giá' : 'Sản phẩm 2 tốt hơn về giá',
-            rating: product1.rating > product2.rating ? 'Sản phẩm 1 tốt hơn về rating' : 'Sản phẩm 2 tốt hơn về rating',
-            quantity: product1.quantity > product2.quantity ? 'Sản phẩm 1 tốt hơn về số lượng' : 'Sản phẩm 2 tốt hơn về số lượng',
-            sold: product1.sold > product2.sold ? 'Sản phẩm 1 tốt hơn về số lượng đã bán' : 'Sản phẩm 2 tốt hơn về số lượng đã bán',
+            price: product1.price < product2.price ? 'product1' : 'product2',
+            quantity: product1.quantity > product2.quantity ? 'product1' : 'product2',
+            sold: product1.sold > product2.sold ? 'product1' : 'product2',
+            rating: product1.rating > product2.rating ? 'product1' : 'product2',
+            image: product1.image && product2.image ? 'both' : product1.image ? 'product1' : 'product2'
         };
 
+        // Tính toán phần trăm chênh lệch
+        const priceDiff = Math.abs(((product1.price - product2.price) / Math.max(product1.price, product2.price)) * 100);
+        const quantityDiff = Math.abs(((product1.quantity - product2.quantity) / Math.max(product1.quantity, product2.quantity)) * 100);
+        const soldDiff = Math.abs(((product1.sold - product2.sold) / Math.max(product1.sold, product2.sold)) * 100);
+        const ratingDiff = Math.abs(((product1.rating - product2.rating) / Math.max(product1.rating, product2.rating)) * 100);
+
         const result = {
-            product1,
-            product2,
-            betterProduct
+            product1: {
+                _id: product1._id,
+                name: product1.name,
+                price: product1.price,
+                quantity: product1.quantity,
+                sold: product1.sold,
+                rating: product1.rating,
+                image: product1.image,
+                description: product1.description,
+                numReviews: product1.numReviews
+            },
+            product2: {
+                _id: product2._id,
+                name: product2.name,
+                price: product2.price,
+                quantity: product2.quantity,
+                sold: product2.sold,
+                rating: product2.rating,
+                image: product2.image,
+                description: product2.description,
+                numReviews: product2.numReviews
+            },
+            betterProduct,
+            differences: {
+                price: {
+                    difference: priceDiff.toFixed(2),
+                    better: betterProduct.price
+                },
+                quantity: {
+                    difference: quantityDiff.toFixed(2),
+                    better: betterProduct.quantity
+                },
+                sold: {
+                    difference: soldDiff.toFixed(2),
+                    better: betterProduct.sold
+                },
+                rating: {
+                    difference: ratingDiff.toFixed(2),
+                    better: betterProduct.rating
+                }
+            }
         };
 
         return res.status(200).json({
-            message: 'Kết quả so sánh thành công',
+            message: 'Comparison successful',
             result
         });
     } catch (err) {
