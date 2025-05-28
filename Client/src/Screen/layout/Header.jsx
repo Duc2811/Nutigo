@@ -72,7 +72,7 @@ const Header = () => {
   const handleLanguageChange = (lang) => i18n.changeLanguage(lang);
 
   // Navigation handlers for new sections
-  const handleHome = () => navigate("/");
+  const handleHome = () => navigate("/home");
   const handleProduct = () => navigate("/all-products");
   const handleBlog = () => navigate("/blog");
 
