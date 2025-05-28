@@ -12,7 +12,7 @@ import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-
+import React, { useEffect } from "react";
 import Login from "./Screen/Client/Login";
 import Register from "./Screen/Client/Register";
 import Forgot from "./Screen/Client/Forgot";
@@ -91,6 +91,8 @@ import GoogleCallback from './Screen/Client/GoogleCallback';
 
 const App = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
+ 
+
   return (
     <I18nextProvider i18n={i18n}>
       <ToastContainer position="top-right" autoClose={3000} />
