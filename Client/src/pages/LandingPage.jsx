@@ -83,7 +83,7 @@ const LandingPage = () => {
                     }}
                   >
                     Welcome to
-                    <p>NitiGo Shop</p>
+                    <p>NutiGo Shop</p>
                   </Title>
 
                   <Paragraph
