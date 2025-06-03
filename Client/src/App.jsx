@@ -86,6 +86,7 @@ import UserDiscount from "./Screen/Admin/discount/userDiscount";
 //Ship
 // import ShiperDashboard from "./Screen/Shiper/ShipperDashboard";
 import ShiperLayout from "./Screen/Shiper/ShiperLayout";
+import Contact from "./Screen/Client/contact/Contact";
 
 
 const App = () => {
@@ -114,7 +115,6 @@ const App = () => {
         <Router>
           <Routes>
             {/* duc */}
-
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -146,6 +146,7 @@ const App = () => {
             <Route path="/updateproduct" element={<UpdateProduct />} />
             <Route path="/viewproduct" element={<ViewProduct />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/contact" element={<Contact/>} />
             <Route path="/addSubCategory" element={<AddSubCategory />} />
             <Route path="/viewCategory" element={<ViewCategory />} />
             {/* nam */}
@@ -173,12 +174,17 @@ const App = () => {
               <Route path="manage-ads" element={<AdsController />} />
               {/* discount */}
               <Route path="manage-discount" element={<DiscountDashboard />} />
-              <Route path="discountStatistics" element={<DiscountStatistics />} />
+              <Route
+                path="discountStatistics"
+                element={<DiscountStatistics />}
+              />
               <Route path="createDiscount" element={<CreateDiscount />} />
-              <Route path="updateDiscount/:discountId" element={<UpdateDiscount />} />
+              <Route
+                path="updateDiscount/:discountId"
+                element={<UpdateDiscount />}
+              />
               <Route path="userDiscount" element={<UserDiscount />} />
             </Route>
-
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:id" element={<BlogDetail />} />
             {/* tuan */}
@@ -192,10 +198,8 @@ const App = () => {
             <Route path="/sale/update" element={<UpdateSaleScreen />} />
             <Route path="/sale/orders" element={<SaleOrderManagement />} />
             <Route path="/product-sale/:id" element={<ProductSaleDetail />} />;
-
             <Route path="/sale/dashboard" element={<SaleScreen />} />
             {/* end */}
-
             {/* Ship */}
             {/* <Route path="/shipper" element={<ShiperDashboard />} /> */}
             <Route path="/shipper/login" element={<ShiperLogin />} />
@@ -209,8 +213,6 @@ const App = () => {
             >
               <Route index element={<OrderManagementShiper />} />
             </Route>
-
-
             <Route path="/luckywheel" element={<LuckyWheel />} />
             <Route path="/compare" element={<CompareProducts />} />
             <Route path="*" element={<NotFound />} />
