@@ -76,7 +76,7 @@ import SearchProduct from "./Screen/Client/product/searchProduct";
 
 import LuckyWheel from "./Screen/discount/luckWheel";
 import CompareProducts from "./Screen/Client/product/compareProducts";
-
+import Contact from "./Screen/Client/contact/Contact";
 import DiscountDashboard from "./Screen/Admin/discount/discountDashboard";
 import DiscountStatistics from "./Screen/Admin/discount/discountStatistics";
 import CreateDiscount from "./Screen/Admin/discount/createDiscount";
@@ -86,8 +86,9 @@ import UserDiscount from "./Screen/Admin/discount/userDiscount";
 //Ship
 // import ShiperDashboard from "./Screen/Shiper/ShipperDashboard";
 import ShiperLayout from "./Screen/Shiper/ShiperLayout";
-import Contact from "./Screen/Client/contact/Contact";
 
+import GoogleCallback from './Screen/Client/GoogleCallback';
+import About from "./Screen/Client/contact/About";
 
 const App = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
@@ -123,6 +124,8 @@ const App = () => {
             <Route path="/verify" element={<VerifyScreen />} />
             <Route path="/otp/:email" element={<Otp />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About/>} />
             <Route path="/cart">
               <Route index element={<Cart />} />
               <Route path="checkout" element={<Checkout />} />
@@ -146,7 +149,6 @@ const App = () => {
             <Route path="/updateproduct" element={<UpdateProduct />} />
             <Route path="/viewproduct" element={<ViewProduct />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/contact" element={<Contact/>} />
             <Route path="/addSubCategory" element={<AddSubCategory />} />
             <Route path="/viewCategory" element={<ViewCategory />} />
             {/* nam */}
@@ -215,6 +217,7 @@ const App = () => {
             </Route>
             <Route path="/luckywheel" element={<LuckyWheel />} />
             <Route path="/compare" element={<CompareProducts />} />
+            <Route path="/google-callback" element={<GoogleCallback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

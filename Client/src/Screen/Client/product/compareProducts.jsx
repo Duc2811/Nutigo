@@ -1,14 +1,23 @@
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Table, Typography, Spin, Button, Card } from "antd";
+import { Table, Typography, Spin, Button, Card, Progress, Row, Col, Space, Tag } from "antd";
 import { toast } from "react-toastify";
 import { compareProducts } from "../../../Service/Client/ApiProduct";
 import Header from "../../layout/Header";
 import Footer from "../../layout/Footer";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { 
+  DollarOutlined, 
+  ShoppingCartOutlined, 
+  StarOutlined, 
+  FireOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
 
-const { Title } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const CompareProducts = () => {
   const { t } = useTranslation("compare");
@@ -45,106 +54,99 @@ const CompareProducts = () => {
     }
   }, [product1Id, product2Id, t]);
 
-  const data = useMemo(() => {
-    if (!comparisonData) return [];
-    const { product1, product2, betterProduct } = comparisonData;
+  const getDifferenceColor = (difference, better) => {
+    if (better === 'both') return '#52c41a';
+    return difference > 50 ? '#ff4d4f' : difference > 20 ? '#faad14' : '#52c41a';
+  };
 
-    return [
-      {
-        key: "1",
-        attribute: t("price"),
-        product1: product1.price.toLocaleString() + " đ",
-        product2: product2.price.toLocaleString() + " đ",
-        highlight: betterProduct.price === "product1" ? t("better.price1") : t("better.price2"),
-      },
-      {
-        key: "2",
-        attribute: t("quantity"),
-        product1: product1.quantity,
-        product2: product2.quantity,
-        highlight: betterProduct.quantity === "product1" ? t("better.quantity1") : t("better.quantity2"),
-      },
-      {
-        key: "3",
-        attribute: t("sold"),
-        product1: product1.sold,
-        product2: product2.sold,
-        highlight: betterProduct.sold === "product1" ? t("better.sold1") : t("better.sold2"),
-      },
-      {
-        key: "4",
-        attribute: t("reviews"),
-        product1: product1.numReviews,
-        product2: product2.numReviews,
-        highlight: betterProduct.rating === "product1" ? t("better.rating1") : t("better.rating2"),
-      },
-      {
-        key: "5",
-        attribute: t("image"),
-        product1: (
-          <img
-            src={product1.image}
-            alt={product1.name}
-            style={{ width: "100%", maxWidth: "120px", aspectRatio: "1/1", objectFit: "cover", borderRadius: "8px" }}
-          />
-        ),
-        product2: (
-          <img
-            src={product2.image}
-            alt={product2.name}
-            style={{ width: "100%", maxWidth: "120px", aspectRatio: "1/1", objectFit: "cover", borderRadius: "8px" }}
-          />
-        ),
-        highlight: betterProduct.image === "product1" ? t("better.image1") : t("better.image2"),
-      },
-    ];
-  }, [comparisonData, t]);
+  const getDifferenceIcon = (better) => {
+    if (better === 'both') return <CheckCircleOutlined />;
+    return better === 'product1' ? <ArrowUpOutlined /> : <ArrowDownOutlined />;
+  };
 
-  const columns = useMemo(
-    () => [
-      {
-        title: t("attribute"),
-        dataIndex: "attribute",
-        width: "30%",
-        render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
-      },
-      {
-        title: comparisonData?.product1.name || t("product1"),
-        dataIndex: "product1",
-        width: "35%",
-        render: (text, record) => (
-          <span
+  const renderComparisonCard = (product, isFirst) => {
+    const isBetter = (attribute) => {
+      if (!comparisonData) return false;
+      return comparisonData.betterProduct[attribute] === (isFirst ? 'product1' : 'product2');
+    };
+
+    return (
+      <Card
+        bordered={false}
+        style={{
+          background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#fff',
+          borderRadius: '15px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          height: '100%'
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <img
+            src={product.image}
+            alt={product.name}
             style={{
-              fontWeight: record.highlight.includes("Sản phẩm 1") || record.highlight.includes("Product 1") ? 600 : 400,
-              color: isDarkMode ? "#fff" : "#000",
+              width: '200px',
+              height: '200px',
+              objectFit: 'contain',
+              marginBottom: '16px'
             }}
-          >
-            {text}
-          </span>
-        ),
-      },
-      {
-        title: comparisonData?.product2.name || t("product2"),
-        dataIndex: "product2",
-        width: "35%",
-        render: (text, record) => (
-          <span
-            style={{
-              fontWeight: record.highlight.includes("Sản phẩm 2") || record.highlight.includes("Product 2") ? 600 : 400,
-              color: isDarkMode ? "#fff" : "#000",
-            }}
-          >
-            {text}
-          </span>
-        ),
-      },
-    ],
-    [comparisonData, isDarkMode, t]
-  );
+          />
+          <Title level={4} style={{ marginBottom: '8px' }}>{product.name}</Title>
+          <Text type="secondary" style={{ fontSize: '14px' }}>
+            {product.description}
+          </Text>
+        </div>
+
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div>
+            <Space>
+              <DollarOutlined style={{ color: isBetter('price') ? '#52c41a' : '#999' }} />
+              <Text strong>Price:</Text>
+              <Text>{product.price.toLocaleString()} đ</Text>
+              {isBetter('price') && <Tag color="success">Best Price</Tag>}
+            </Space>
+          </div>
+
+          <div>
+            <Space>
+              <ShoppingCartOutlined style={{ color: isBetter('quantity') ? '#52c41a' : '#999' }} />
+              <Text strong>Stock:</Text>
+              <Text>{product.quantity}</Text>
+              {isBetter('quantity') && <Tag color="success">More Stock</Tag>}
+            </Space>
+          </div>
+
+          <div>
+            <Space>
+              <FireOutlined style={{ color: isBetter('sold') ? '#52c41a' : '#999' }} />
+              <Text strong>Sold:</Text>
+              <Text>{product.sold}</Text>
+              {isBetter('sold') && <Tag color="success">More Popular</Tag>}
+            </Space>
+          </div>
+
+          <div>
+            <Space>
+              <StarOutlined style={{ color: isBetter('rating') ? '#52c41a' : '#999' }} />
+              <Text strong>Rating:</Text>
+              <Text>{product.rating.toFixed(1)}</Text>
+              {isBetter('rating') && <Tag color="success">Better Rating</Tag>}
+            </Space>
+          </div>
+        </Space>
+      </Card>
+    );
+  };
 
   if (loading) {
     return (
-      <div className="compare-loading" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div style={{ 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        height: "100vh",
+        background: isDarkMode ? '#1a1a1a' : '#f0f2f5'
+      }}>
         <Spin size="large" />
       </div>
     );
@@ -152,9 +154,21 @@ const CompareProducts = () => {
 
   if (!comparisonData) {
     return (
-      <div className={isDarkMode ? "dark-mode" : "light-mode"} style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <div style={{ 
+        minHeight: "100vh", 
+        display: "flex", 
+        flexDirection: "column",
+        background: isDarkMode ? '#1a1a1a' : '#f0f2f5'
+      }}>
         <Header />
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+        <div style={{ 
+          flex: 1, 
+          display: "flex", 
+          flexDirection: "column", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          padding: "24px" 
+        }}>
           <Title level={3} style={{ textAlign: "center", marginBottom: "24px" }}>
             {t("noData")}
           </Title>
@@ -168,37 +182,107 @@ const CompareProducts = () => {
   }
 
   return (
-    <div className={isDarkMode ? "dark-mode" : "light-mode"} style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ 
+      minHeight: "100vh", 
+      display: "flex", 
+      flexDirection: "column",
+      background: isDarkMode ? '#1a1a1a' : '#f0f2f5'
+    }}>
       <Header />
-      <div style={{ flex: 1, padding: "24px", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+      <div style={{ 
+        flex: 1, 
+        padding: "24px", 
+        maxWidth: "1200px", 
+        margin: "0 auto", 
+        width: "100%" 
+      }}>
         <Title level={2} style={{ textAlign: "center", marginBottom: "32px" }}>
           {t("title")}
         </Title>
+
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={12}>
+            {renderComparisonCard(comparisonData.product1, true)}
+          </Col>
+          <Col xs={24} md={12}>
+            {renderComparisonCard(comparisonData.product2, false)}
+          </Col>
+        </Row>
+
         <Card
           bordered={false}
           style={{
-            boxShadow: isDarkMode ? "0 4px 12px rgba(255,255,255,0.1)" : "0 4px 12px rgba(0,0,0,0.1)",
-            borderRadius: "12px",
-            overflow: "hidden",
+            marginTop: '24px',
+            background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#fff',
+            borderRadius: '15px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
           }}
         >
-          <Table
-            dataSource={data}
-            columns={columns}
-            pagination={false}
-            rowClassName={() => "compare-table-row"}
-            style={{ borderRadius: "12px" }}
-            scroll={{ x: true }}
-          />
+          <Title level={4} style={{ marginBottom: '24px' }}>Detailed Comparison</Title>
+          <Row gutter={[24, 24]}>
+            {Object.entries(comparisonData.differences).map(([key, value]) => (
+              <Col xs={24} sm={12} key={key}>
+                <Card
+                  bordered={false}
+                  style={{
+                    background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#fafafa',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Space>
+                      {key === 'price' && <DollarOutlined />}
+                      {key === 'quantity' && <ShoppingCartOutlined />}
+                      {key === 'sold' && <FireOutlined />}
+                      {key === 'rating' && <StarOutlined />}
+                      <Text strong style={{ textTransform: 'capitalize' }}>{key}</Text>
+                    </Space>
+                    <Progress
+                      percent={parseFloat(value.difference)}
+                      showInfo={false}
+                      strokeColor={getDifferenceColor(value.difference, value.better)}
+                    />
+                    <Space>
+                      <Text type="secondary">Difference: {value.difference}%</Text>
+                      {getDifferenceIcon(value.better)}
+                      <Text type="secondary">
+                        {value.better === 'both' ? 'Equal' : 
+                         value.better === 'product1' ? 'Product 1 Better' : 'Product 2 Better'}
+                      </Text>
+                    </Space>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </Card>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px", marginTop: "24px" }}>
-          <Button type="primary" onClick={() => navigate(`/product/${product1Id}`)} size="large">
-            {comparisonData.product1.name}
+
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "center", 
+          gap: "16px", 
+          marginTop: "24px" 
+        }}>
+          <Button 
+            type="primary" 
+            onClick={() => navigate(`/product/${product1Id}`)} 
+            size="large"
+            icon={<ShoppingCartOutlined />}
+          >
+            View {comparisonData.product1.name}
           </Button>
-          <Button type="primary" onClick={() => navigate(`/product/${product2Id}`)} size="large">
-            {comparisonData.product2.name}
+          <Button 
+            type="primary" 
+            onClick={() => navigate(`/product/${product2Id}`)} 
+            size="large"
+            icon={<ShoppingCartOutlined />}
+          >
+            View {comparisonData.product2.name}
           </Button>
-          <Button onClick={() => navigate("/")} size="large">
+          <Button 
+            onClick={() => navigate("/")} 
+            size="large"
+          >
             {t("back")}
           </Button>
         </div>

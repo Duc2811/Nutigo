@@ -11,6 +11,9 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 //connet db
 const database = require('./Config/database')
+const session = require('express-session')
+const passport = require('./config/passport')
+
 database.connect();
 
 app.use(express.json());
@@ -23,7 +26,13 @@ app.use(cookieParser())
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors({
     origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
@@ -42,8 +51,6 @@ app.use((err, req, res, next) => {
     console.error('Unhandled Error:', err);
     res.status(500).json({ message: 'Internal Server Error' });
 });
-
-
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

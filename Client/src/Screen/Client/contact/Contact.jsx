@@ -1,181 +1,211 @@
-import React, { useRef } from "react";
-import emailjs from "emailjs-com";
+import React, { useRef, useEffect } from "react";
+import emailjs from "@emailjs/browser";
+import { Form, Input, Button, message } from "antd";
 import {
   PhoneOutlined,
   MailOutlined,
   ClockCircleOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import Header from "../../layout/Header";
 
-export default function Contact() {
-  const form = useRef();
+const Contact = () => {
+  const formRef = useRef(null);
+  const [formInstance] = Form.useForm();
 
-  const sendEmail = (e) => {
-    e.preventDefault();
+  const sendEmail = (values) => {
+    console.log("Sending email with values:", values);
+
+    const templateParams = {
+      title: "Tin nhắn từ trang liên hệ",
+      name: values.user_name,
+      email: values.user_email,
+      message: values.message,
+      time: new Date().toLocaleString(),
+    };
 
     emailjs
-      .sendForm(
-        "service_laqbptk",
-        "template_h057pzr",
-        form.current,
-        "0mTxxxxxYOURPUBLICKEY"
+      .send(
+        "service_laqbptk", // service ID
+        "template_lhd0pl7", // template ID
+        templateParams,
+        "tV0Shp_m0AJZ08zDT" // public key
       )
-      .then(
-        (result) => {
-          alert("Gửi thành công!");
-          form.current.reset();
-        },
-        (error) => {
-          alert("Lỗi gửi: " + error.text);
-        }
-      );
+      .then(() => {
+        message.success("Gửi tin nhắn thành công!");
+        formInstance.resetFields();
+      })
+      .catch((error) => {
+        console.error("EmailJS Error:", error);
+        message.error(
+          "Gửi không thành công: " +
+            (error?.text || error?.message || "Lỗi không xác định")
+        );
+      });
   };
 
+  useEffect(() => {
+    const initMap = () => {
+      const map = new window.google.maps.Map(document.getElementById("map"), {
+        center: { lat: 10.7769, lng: 106.7009 },
+        zoom: 15,
+      });
+      new window.google.maps.Marker({
+        position: { lat: 10.7769, lng: 106.7009 },
+        map,
+        title: "Cửa Hàng Hạt Giống",
+      });
+    };
+
+    if (window.google && window.google.maps) {
+      initMap();
+    } else {
+      console.warn("Google Maps chưa được load.");
+    }
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Header */}
-      <div className="bg-green-600 text-white text-center py-6 rounded-t-2xl">
-        <h1 className="text-3xl font-bold">Liên Hệ Với Chúng Tôi</h1>
-        <p className="mt-2">
-          Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn về các sản phẩm chất lượng
-          cao
-        </p>
-      </div>
-
-      {/* Contact Info Section */}
-      <div className="flex flex-col md:flex-row gap-6 justify-between mt-6">
-        {/* Phone */}
-        <div className="bg-white p-6 rounded-2xl shadow-lg text-center flex-1">
-          <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center">
-            <PhoneOutlined style={{ fontSize: "24px", color: "#10b981" }} />
-          </div>
-          <h3 className="mt-4 font-semibold">Điện Thoại</h3>
-          <p className="text-gray-600">Hotline bán hàng</p>
-          <p className="text-lg font-bold text-gray-800">0123 456 789</p>
-        </div>
-
-        {/* Email */}
-        <div className="bg-white p-6 rounded-2xl shadow-lg text-center flex-1">
-          <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center">
-            <MailOutlined style={{ fontSize: "24px", color: "#10b981" }} />
-          </div>
-          <h3 className="mt-4 font-semibold">Email</h3>
-          <p className="text-gray-600">Liên hệ trực tuyến</p>
-          <p className="text-lg font-bold text-gray-800">
-            contact@hatgiong.com
+    <div>
+      <Header />
+      <div className="min-h-screen bg-gray-100 p-6" style={{ margin: "50px" }}>
+        <div className="bg-green-600 text-center py-6 rounded-t-2xl mb-4" style={{margin :'150px'}}>
+          <h1 className="text-3xl font-bold">Liên Hệ Với Chúng Tôi</h1>
+          <p className="mt-2">
+            Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn về các sản phẩm chất lượng
+            cao
           </p>
         </div>
 
-        {/* Giờ Làm Việc */}
-        <div className="bg-white p-6 rounded-2xl shadow-lg text-center flex-1">
-          <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center">
-            <ClockCircleOutlined
-              style={{ fontSize: "24px", color: "#10b981" }}
-            />
-          </div>
-          <h3 className="mt-4 font-semibold">Giờ Làm Việc</h3>
-          <p className="text-gray-600">Thứ 2 - Chủ nhật</p>
-          <p className="text-lg font-bold text-gray-800">8:00 - 18:00</p>
+        <div
+          className="flex gap-6 justify-between flex-wrap"
+          style={{ marginTop: "50px" }}
+        >
+          <InfoBox
+            icon={<PhoneOutlined />}
+            title="Điện Thoại"
+            description="Hotline bán hàng"
+            detail="0123 456 789"
+          />
+          <InfoBox
+            icon={<MailOutlined />}
+            title="Email"
+            description="Liên hệ trực tuyến"
+            detail="contact@hatgiong.com"
+          />
+          <InfoBox
+            icon={<ClockCircleOutlined />}
+            title="Giờ Làm Việc"
+            description="Thứ 2 - Chủ nhật"
+            detail="8:00 - 18:00"
+          />
         </div>
-      </div>
 
-      {/* Form and Map Section */}
-      <div className="flex flex-col lg:flex-row gap-6 mt-6">
-        {/* Form */}
-        <div className="flex-1 bg-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4">Gửi Tin Nhắn</h2>
-          <form ref={form} onSubmit={sendEmail} className="space-y-4">
-            <div>
-              <label className="block text-gray-700 mb-1">Họ và tên *</label>
-              <input
-                type="text"
-                name="user_name"
-                placeholder="Nhập họ và tên của bạn"
-                required
-                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 mb-1">
-                Số điện thoại *
-              </label>
-              <input
-                type="text"
-                name="user_phone"
-                placeholder="Nhập số điện thoại"
-                required
-                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 mb-1">Email *</label>
-              <input
-                type="email"
-                name="user_email"
-                placeholder="Nhập địa chỉ email của bạn"
-                required
-                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 mb-1">Chủ đề</label>
-              <input
-                type="text"
-                name="subject"
-                placeholder="Tư vấn sản phẩm, bảo hành..."
-                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 mb-1">
-                Nội dung tin nhắn *
-              </label>
-              <textarea
-                name="message"
-                rows="5"
-                placeholder="Nhập nội dung tin nhắn của bạn..."
-                required
-                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
+        <div
+          className="flex flex-col lg:flex-row gap-6 mt-6"
+          style={{ marginTop: "150px" }}
+        >
+          <div
+            className="flex-1 bg-white p-6 rounded-2xl shadow-lg"
+            style={{ padding: "20px" }}
+          >
+            <h2 className="text-2xl font-semibold mb-4">Gửi Tin Nhắn</h2>
+            <Form
+              form={formInstance}
+              name="contact"
+              layout="vertical"
+              onFinish={sendEmail}
+              autoComplete="off"
+              className="space-y-4"
+              ref={formRef}
             >
-              Gửi Tin Nhắn
-            </button>
-          </form>
-        </div>
+              <Form.Item
+                label="Họ và Tên"
+                name="user_name"
+                rules={[
+                  { required: true, message: "Vui lòng nhập họ và tên!" },
+                ]}
+              >
+                <Input
+                  prefix={<UserOutlined />}
+                  placeholder="Nhập họ và tên của bạn"
+                  size="large"
+                  className="rounded"
+                />
+              </Form.Item>
 
-        {/* Map and Info */}
-        <div className="flex-1 bg-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4">Địa Chỉ Cửa Hàng</h2>
-          <p className="text-lg font-semibold text-gray-800">
-            Cửa Hàng Hạt Giống Chất Lượng
-          </p>
-          <p className="text-gray-600 mt-1">
-            123 Đường Nguyễn Văn A, Phường 1, Quận Bình Thạnh, TP. Hồ Chí Minh
-          </p>
-          <p className="text-gray-700 mt-4 font-semibold">Thông tin thêm:</p>
-          <ul className="list-disc list-inside text-gray-600 mt-2">
-            <li>Chuyên cung cấp hạt giống chất lượng cao</li>
-            <li>Tư vấn kỹ thuật miễn phí</li>
-            <li>Giao hàng toàn quốc</li>
-            <li>Bảo hành lâu dài các sản phẩm</li>
-          </ul>
-          <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:underline">
-              Xem bản đồ lớn hơn
-            </a>
+              <Form.Item
+                label="Email"
+                name="user_email"
+                rules={[
+                  { required: true, message: "Vui lòng nhập email!" },
+                  { type: "email", message: "Email không hợp lệ!" },
+                ]}
+              >
+                <Input
+                  prefix={<MailOutlined />}
+                  placeholder="Nhập địa chỉ email của bạn"
+                  size="large"
+                  className="rounded"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Nội Dung Tin Nhắn"
+                name="message"
+                rules={[{ required: true, message: "Vui lòng nhập nội dung!" }]}
+              >
+                <Input.TextArea
+                  rows={5}
+                  placeholder="Nhập nội dung tin nhắn của bạn..."
+                  className="rounded"
+                />
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  Gửi Tin Nhắn
+                </Button>
+              </Form.Item>
+            </Form>
           </div>
-          <iframe
-            title="Google Map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.123456789!2d106.7... (thay link thật)"
-            className="w-full h-64 mt-4 rounded"
-            loading="lazy"
-            allowFullScreen
-          ></iframe>
+        </div>
+        <div className="flex-1" style={{ margin: "50px" }}>
+          <h2 className="text-2xl font-semibold mb-4">Bản đồ</h2>
+          <div className="w-full h-[450px]">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.5290259893697!2d105.54760121533235!3d21.01143209361382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313453a453a9f43b%3A0x9c6a4e5a2be84799!2zVGjDoWNoIFRo4bqtdCwgSG_DoG5nIFThu6sgSG_DoG5n!5e0!3m2!1svi!2s!4v1717399358824!5m2!1svi!2s"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+// Component phụ cho phần thông tin
+const InfoBox = ({ icon, title, description, detail }) => (
+  <div className="bg-white p-6 rounded-2xl shadow-lg text-center flex-1 min-w-[250px]">
+    <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center">
+      {React.cloneElement(icon, {
+        style: { fontSize: "24px", color: "#10b981" },
+      })}
+    </div>
+    <h3 className="mt-4 font-semibold">{title}</h3>
+    <p className="text-gray-600">{description}</p>
+    <p className="text-lg font-bold text-gray-800">{detail}</p>
+  </div>
+
+);
+
+export default Contact;
