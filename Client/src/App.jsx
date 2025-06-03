@@ -12,7 +12,6 @@ import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-import React, { useEffect } from "react";
 import Login from "./Screen/Client/Login";
 import Register from "./Screen/Client/Register";
 import Forgot from "./Screen/Client/Forgot";
@@ -38,14 +37,9 @@ import OrderDetails from "./Screen/Client/Order/OrderDetail";
 import OrderScreen from "./Screen/Client/Order/Order";
 
 import DashBoard from "./Screen/ProductManager/DashBoard";
-import AddProduct from "./Screen/ProductManager/AddProduct";
-import AddCategory from "./Screen/ProductManager/AddCategory";
-import DeleteProduct from "./Screen/ProductManager/DelteProduct";
-import UpdateProduct from "./Screen/ProductManager/UpadateProduct";
-import ViewProduct from "./Screen/ProductManager/ViewProudct";
+import ProductManager from "./Screen/ProductManager/productManager";
 import ProductDetail from "./Screen/Client/product/productDetail";
-import AddSubCategory from "./Screen/ProductManager/AddSubCategory";
-import ViewCategory from "./Screen/ProductManager/ViewCategory";
+import MangerCategory from "./Screen/ProductManager/MangerCategory";
 
 //Admin Page
 import AdminLayout from "./Screen/Admin/AdminLayout";
@@ -91,7 +85,7 @@ import GoogleCallback from './Screen/Client/GoogleCallback';
 
 const App = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
- 
+
 
   return (
     <I18nextProvider i18n={i18n}>
@@ -141,14 +135,10 @@ const App = () => {
             <Route path="/ads" element={<AdsController />} />
             {/* huy */}
             <Route path="/Productdashboard" element={<DashBoard />} />
-            <Route path="/addProduct" element={<AddProduct />} />
-            <Route path="/addCategory" element={<AddCategory />} />
-            <Route path="/deleteproduct" element={<DeleteProduct />} />
-            <Route path="/updateproduct" element={<UpdateProduct />} />
-            <Route path="/viewproduct" element={<ViewProduct />} />
+
+            <Route path="/productManager" element={<ProductManager />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/addSubCategory" element={<AddSubCategory />} />
-            <Route path="/viewCategory" element={<ViewCategory />} />
+            <Route path="/categoryManager" element={<MangerCategory />} />
             {/* nam */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { uploadImage } from '../../../Service/Client/ApiProduct';
 import { Button, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { Image } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const UploadProductImage = ({ productId }) => {
     const navigate = useNavigate();
@@ -26,14 +27,14 @@ const UploadProductImage = ({ productId }) => {
             message.error('Chỉ hỗ trợ tải lên file ảnh!');
             return Upload.LIST_IGNORE;
         }
-    
+
         const base64Image = await convertImageToBase64(file);
         setImagePreview(base64Image);
         setImageBase64(base64Image); // Giữ nguyên tiền tố `data:image/...;base64,`
         return false; // Ngăn Ant Design tự động tải lên
     };
-    
-    
+
+
     const handleSubmit = async () => {
         if (!imageBase64) {
             message.error('Vui lòng chọn một hình ảnh trước khi tải lên.');
@@ -71,6 +72,10 @@ const UploadProductImage = ({ productId }) => {
             </div>
         </div>
     );
+};
+
+UploadProductImage.propTypes = {
+    productId: PropTypes.string.isRequired
 };
 
 export default UploadProductImage;

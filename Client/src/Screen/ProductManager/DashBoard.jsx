@@ -34,8 +34,9 @@ const ProductManagerDashboard = () => {
             setLowStockProducts(products.filter((p) => p.quantity < 10).length);
             const totalStock = products.reduce((sum, product) => sum + product.quantity, 0);
             setRemainingStock(totalStock);
-        } catch (error) {
+        } catch (err) {
             message.error("Lỗi khi lấy dữ liệu sản phẩm!");
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -68,8 +69,9 @@ const ProductManagerDashboard = () => {
             }
 
             setBestRatedProduct(bestProduct);
-        } catch (error) {
+        } catch (err) {
             message.error("Lỗi khi lấy dữ liệu đánh giá!");
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -91,8 +93,9 @@ const ProductManagerDashboard = () => {
                 quantity: sale.quantity
             }));
             setSalesData(formattedSalesData);
-        } catch (error) {
+        } catch (err) {
             message.error("Lỗi khi lấy dữ liệu bán hàng!");
+            console.error(err);
         } finally {
             setLoading(false);
         }

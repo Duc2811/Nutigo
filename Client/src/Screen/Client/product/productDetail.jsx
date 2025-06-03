@@ -25,9 +25,9 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../../store/reducer/cartReducer";
-import BottomAds from "../../../Component/BottomAds"
-import LeftAdsBanner from "../../../Component/LeftAds";
-import RightAdsBanner from "../../../Component/RightAds";
+// import BottomAds from "../../../Component/BottomAds"
+// import LeftAdsBanner from "../../../Component/LeftAds";
+// import RightAdsBanner from "../../../Component/RightAds";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
@@ -519,9 +519,9 @@ const ProductDetail = () => {
         </Container>
       </Container>
       <Footer />
-      <BottomAds />
-      <LeftAdsBanner />
-      <RightAdsBanner />
+      {/* <BottomAds /> */}
+      {/* <LeftAdsBanner />
+      <RightAdsBanner /> */}
     </>
   );
 };

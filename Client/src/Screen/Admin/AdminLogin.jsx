@@ -9,6 +9,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import { useSpring, animated } from "react-spring";
 import { useTranslation } from "react-i18next";
 import { Image } from "antd";
+import Logo from "../../../public/Logo.jpg";
 
 import { useSelector } from "react-redux";
 
@@ -93,7 +94,7 @@ const Login = () => {
                                 {/* Logo Section */}
                                 <Form.Group className="mb-5 text-center">
                                     <Image
-                                        src="/L.png"
+                                        src={Logo}
                                         alt="Logo"
                                         width={120}
                                         className="mb-3"
