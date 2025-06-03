@@ -6,11 +6,12 @@ import {
   Dropdown,
   Switch,
   Badge,
+  Spin,
 } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   UserOutlined,
   LoginOutlined,
@@ -24,27 +25,28 @@ import {
   ShopOutlined,
   BookOutlined,
 } from "@ant-design/icons";
+import { getAllCategory } from "../../Service/Client/ApiProduct";
 
 import ButtonAntd from "../../Component/Button";
 import InputSearch from "../../component/InputSearch";
 import { doLogout, doDarkMode } from "../../store/reducer/userReducer";
-import { toast } from "react-toastify"
-
+import { toast } from "react-toastify";
 
 const DEFAULT_LOGO = "/NutiGo.png";
 
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation(); // Để lấy đường dẫn hiện tại
+  const location = useLocation();
   const { t } = useTranslation("header");
   const { i18n } = useTranslation();
-  // Redux state selectors
   const { token, _id: userId } = useSelector((state) => state.user?.user || {});
   const { nameApp, logo } = useSelector((state) => state.admin?.app || {});
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const cartItems = useSelector((state) => state.cart.items[userId] || []);
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Effects
   useEffect(() => {
@@ -54,6 +56,26 @@ const Header = () => {
       iconLink.href = logo;
     }
   }, [logo, nameApp]);
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true);
+        const response = await getAllCategory();
+        if (response && Array.isArray(response.categories)) {
+          setCategories(response.categories);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error(t("Failed to load categories"));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [t, setIsLoading]);
 
   // Event handlers
   const handleLogin = () => navigate("/login");
@@ -84,6 +106,46 @@ const Header = () => {
     if (path.includes("/blog")) return ["blog"];
     return [];
   };
+
+  // Create product menu with categories and subcategories
+  const productMenu = (
+    <Menu
+      style={{
+        minWidth: "200px",
+        borderRadius: "8px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        backgroundColor: isDarkMode ? "#1e2a3c" : "#fff",
+      }}
+    >
+      {isLoading ? (
+        <Menu.Item disabled>
+          <Space>
+            <Spin size="small" />
+            {t("Loading categories...")}
+          </Space>
+        </Menu.Item>
+      ) : categories.length === 0 ? (
+        <Menu.Item disabled>{t("No categories available")}</Menu.Item>
+      ) : (
+        categories.map((category) => (
+          <Menu.SubMenu
+            key={category._id}
+            title={category.name}
+            icon={<ShopOutlined />}
+          >
+            {category.subCategories?.map((sub) => (
+              <Menu.Item
+                key={sub._id}
+                onClick={() => navigate(`/all-products?subcategory=${sub._id}`)}
+              >
+                {sub.name}
+              </Menu.Item>
+            ))}
+          </Menu.SubMenu>
+        ))
+      )}
+    </Menu>
+  );
 
   // Profile dropdown menu
   const profileMenu = (
@@ -173,7 +235,7 @@ const Header = () => {
           alt={nameApp || "Logo"}
           style={{
             cursor: "pointer",
-            paddingTop:"15px",
+            paddingTop: "15px",
             borderRadius: "8px",
             width: '120px',
             transition: "transform 0.3s ease",
@@ -184,11 +246,11 @@ const Header = () => {
         />
       </div>
 
-      {/* Navigation Section (Home, Product, Blog) */}
+      {/* Navigation Section */}
       <Menu
         mode="horizontal"
-        selectedKeys={getSelectedKey()} // Tab hiện tại
-        theme={isDarkMode ? "dark" : "dark"} // Chuyển đổi giữa dark và light mode
+        selectedKeys={getSelectedKey()}
+        theme={isDarkMode ? "dark" : "dark"}
         style={{
           flex: 1,
           justifyContent: "center",
@@ -205,14 +267,18 @@ const Header = () => {
         >
           {t("Home")}
         </Menu.Item>
-        <Menu.Item
+        <Menu.SubMenu
           key="product"
           icon={<ShopOutlined />}
-          onClick={handleProduct}
-          style={{ color: isDarkMode ? "#fff" : "#fff" }}
+          title={t("Product")}
+          popupClassName={isDarkMode ? "dark-dropdown" : "light-dropdown"}
+          popupOffset={[0, 0]}
+          overlay={productMenu}
         >
-          {t("Product")}
-        </Menu.Item>
+          <Menu.Item key="all-products" onClick={handleProduct}>
+            {t("All Products")}
+          </Menu.Item>
+        </Menu.SubMenu>
         <Menu.Item
           key="blog"
           icon={<BookOutlined />}

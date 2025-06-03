@@ -504,8 +504,6 @@ module.exports.compareProducts = async (req, res) => {
         if (!product1 || !product2) {
             return res.status(404).json({ message: 'One or both products not found' });
         }
-
-        // Tính toán các chỉ số so sánh
         const betterProduct = {
             price: product1.price < product2.price ? 'product1' : 'product2',
             quantity: product1.quantity > product2.quantity ? 'product1' : 'product2',
@@ -513,8 +511,6 @@ module.exports.compareProducts = async (req, res) => {
             rating: product1.rating > product2.rating ? 'product1' : 'product2',
             image: product1.image && product2.image ? 'both' : product1.image ? 'product1' : 'product2'
         };
-
-        // Tính toán phần trăm chênh lệch
         const priceDiff = Math.abs(((product1.price - product2.price) / Math.max(product1.price, product2.price)) * 100);
         const quantityDiff = Math.abs(((product1.quantity - product2.quantity) / Math.max(product1.quantity, product2.quantity)) * 100);
         const soldDiff = Math.abs(((product1.sold - product2.sold) / Math.max(product1.sold, product2.sold)) * 100);

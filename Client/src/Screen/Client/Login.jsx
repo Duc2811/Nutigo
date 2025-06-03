@@ -13,6 +13,8 @@ import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import { useSelector } from "react-redux";
 import GoogleLoginButton from '../../Component/GoogleLoginButton';
+import Logo from "../../../public/Logo.jpg";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -47,7 +49,7 @@ const Login = () => {
         toast.success(res.message);
         dispatch(doLogin({ _id: res.id, token: res.token, role: res.role }));
         if (res.role === "user") {
-          navigate("/");
+          navigate("/home");
         }
         else if (res.role != "user") {
           toast.error("Vui lòng đăng nhập bằng trang Admin !!!");
@@ -86,7 +88,7 @@ const Login = () => {
                 {/* Logo Section */}
                 <Form.Group className="mb-5 text-center">
                   <Image
-                    src="/L.png"
+                    src={Logo}
                     alt="Logo"
                     width={120}
                     className="mb-3"

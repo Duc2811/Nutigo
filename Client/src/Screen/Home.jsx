@@ -1,18 +1,12 @@
-import { Layout, Typography, Row, Col, Carousel, Card, Space, Button, Statistic, Divider } from "antd";
+import { Layout, Typography, Row, Col, Card, Space, Button, Carousel } from "antd";
 import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { 
-  ShoppingCartOutlined, 
-  StarOutlined, 
-  FireOutlined,
+import {
   RocketOutlined,
   SafetyCertificateOutlined,
   CustomerServiceOutlined,
   GlobalOutlined,
   ThunderboltOutlined,
-  HeartOutlined,
-  TeamOutlined
 } from '@ant-design/icons';
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
@@ -25,13 +19,14 @@ import { ToastContainer } from "react-toastify";
 import BottomAds from "../Component/BottomAds";
 import LeftAdsBanner from "../Component/LeftAds";
 import RightAdsBanner from "../Component/RightAds";
-
+import Banner1 from "../assets/Slider/banner1.jpg";
+import Banner2 from "../assets/Slider/baner2.jpg";
+import Banner3 from "../assets/Slider/banner3.jpg";
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 const Home = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
-  const { t } = useTranslation("home");
 
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -42,43 +37,43 @@ const Home = () => {
   const features = [
     {
       icon: <RocketOutlined style={{ fontSize: '32px', color: '#1890ff' }} />,
-      title: 'Fast Delivery',
-      description: 'Get your products delivered within 24 hours'
+      title: 'Giao hàng nhanh',
+      description: 'Giao hàng trong 24h tại nội thành và 2-3 ngày toàn quốc.'
     },
     {
       icon: <SafetyCertificateOutlined style={{ fontSize: '32px', color: '#52c41a' }} />,
-      title: 'Secure Payment',
-      description: '100% secure payment with SSL encryption'
+      title: 'Thanh toán an toàn',
+      description: 'Bảo mật SSL, đa dạng phương thức thanh toán.'
     },
     {
       icon: <CustomerServiceOutlined style={{ fontSize: '32px', color: '#722ed1' }} />,
-      title: '24/7 Support',
-      description: 'Round the clock customer support'
+      title: 'Hỗ trợ 24/7',
+      description: 'Tư vấn tận tâm, hỗ trợ mọi lúc mọi nơi.'
     },
     {
       icon: <GlobalOutlined style={{ fontSize: '32px', color: '#fa8c16' }} />,
-      title: 'Worldwide Shipping',
-      description: 'We ship to over 100 countries'
+      title: 'Vận chuyển toàn cầu',
+      description: 'Giao hàng đến hơn 100 quốc gia.'
     }
   ];
 
   const testimonials = [
     {
-      name: 'John Doe',
-      role: 'Regular Customer',
-      content: 'Amazing products and excellent service. Will definitely shop again!',
+      name: 'Nguyễn Văn A',
+      role: 'Khách hàng thân thiết',
+      content: 'Sản phẩm chất lượng, dịch vụ tuyệt vời. Tôi rất hài lòng!',
       avatar: 'https://randomuser.me/api/portraits/men/1.jpg'
     },
     {
-      name: 'Jane Smith',
-      role: 'Premium Member',
-      content: 'The quality of products is outstanding. Very satisfied with my purchase.',
+      name: 'Trần Thị B',
+      role: 'Thành viên Premium',
+      content: 'Đóng gói đẹp, giao hàng nhanh, sẽ ủng hộ lâu dài.',
       avatar: 'https://randomuser.me/api/portraits/women/1.jpg'
     },
     {
-      name: 'Mike Johnson',
-      role: 'Business Owner',
-      content: 'Great prices and fast delivery. Perfect for my business needs.',
+      name: 'Lê Văn C',
+      role: 'Chủ cửa hàng',
+      content: 'Giá tốt, nguồn hàng ổn định, rất phù hợp cho kinh doanh.',
       avatar: 'https://randomuser.me/api/portraits/men/2.jpg'
     }
   ];
@@ -96,142 +91,178 @@ const Home = () => {
       <Header />
       <Content
         style={{
-          padding: "60px 20px",
+          padding: "60px 0 0 0",
           maxWidth: "1400px",
           margin: "auto",
-          backgroundColor: isDarkMode ? "rgba(33, 37, 43, 0.9)" : "#fff",
-          borderRadius: isDarkMode ? "10px" : "0",
-          boxShadow: isDarkMode ? "0 4px 12px rgba(0, 0, 0, 0.3)" : "none",
         }}
       >
+        {/* Hero Banner */}
+        <motion.div {...fadeIn}>
+          <div
+            style={{
+              width: "100%",
+              minHeight: 350,
+              borderRadius: 24,
+              overflow: "hidden",
+              marginBottom: 40,
+              boxShadow: isDarkMode ? "0 4px 24px rgba(0,0,0,0.5)" : "0 4px 24px rgba(0,0,0,0.12)",
+              background: isDarkMode ? "#23272e" : "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative"
+            }}
+          >
+            <Carousel autoplay dots>
+              {[Banner1, Banner2, Banner3].map((img, idx) => (
+                <div key={idx}>
+                  <img
+                    src={img}
+                    alt={`NutiGo Banner ${idx + 1}`}
+                    style={{
+                      width: "100%",
+                      height: 350,
+                      objectFit: "cover",
+                      filter: isDarkMode ? "brightness(0.85)" : "none"
+                    }}
+                  />
+                </div>
+              ))}
+            </Carousel>
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                background: "rgba(0,0,0,0.15)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                pointerEvents: "none"
+              }}
+            >
+              <Title level={1} style={{ color: '#fff', fontWeight: 900, fontSize: 48, marginBottom: 0 }}>NutiGo Foods</Title>
+              <Paragraph style={{ fontSize: 22, margin: 0, fontWeight: 500 }}>EAT CLEAN - HEALTHY FOOD</Paragraph>
+            </div>
+          </div>
+        </motion.div>
 
+        {/* Features */}
+        <motion.div {...fadeIn}>
+          <Row gutter={[32, 32]} justify="center" style={{ marginBottom: 40 }}>
+            {features.map((feature, idx) => (
+              <Col xs={24} sm={12} md={6} key={idx}>
+                <Card
+                  bordered={false}
+                  style={{
+                    borderRadius: 16,
+                    background: isDarkMode ? "#23272e" : "#f8fafc",
+                    boxShadow: isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.08)",
+                    textAlign: "center",
+                    minHeight: 180
+                  }}
+                >
+                  <div style={{ marginBottom: 16 }}>{feature.icon}</div>
+                  <Text strong style={{ fontSize: 18 }}>{feature.title}</Text>
+                  <Paragraph style={{ margin: 0, color: isDarkMode ? '#bfc9d1' : '#555' }}>{feature.description}</Paragraph>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </motion.div>
 
         {/* Main Content */}
-        <Row gutter={[24, 24]} style={{ paddingTop: "30px" }}>
-          <Col xs={24} sm={4}>
+        <Row gutter={[24, 24]} style={{ paddingTop: "10px" }}>
+          <Col xs={24} sm={5}>
             <motion.div {...fadeIn}>
               <SidebarMenuAntd />
             </motion.div>
           </Col>
-          <Col xs={24} sm={20}>
+          <Col xs={24} sm={19}>
             <motion.div {...fadeIn}>
-              <Carousel
-                autoplay
-                autoplaySpeed={5000}
-                effect="fade"
+              <Card
+                bordered={false}
                 style={{
+                  backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.03)" : "#fff",
                   borderRadius: "15px",
-                  overflow: "hidden",
-                  height: "500px",
-                  position: "relative",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                  marginBottom: 32
                 }}
               >
-                <div>
-                  <img
-                    src="https://file.hstatic.net/200000722513/file/thang_01_laptop_gaming_banner_web_slider_800x400.png"
-                    style={{ 
-                      width: "100%", 
-                      height: "500px", 
-                      objectFit: "cover",
-                      filter: isDarkMode ? "brightness(0.8)" : "none"
-                    }}
-                  />
-                </div>
-                <div>
-                  <img
-                    src="https://file.hstatic.net/200000722513/file/banner_web_slider_800x400_1199a3adfc23489798d4163a97f3bc62.jpg"
-                    style={{ 
-                      width: "100%", 
-                      height: "500px", 
-                      objectFit: "cover",
-                      filter: isDarkMode ? "brightness(0.8)" : "none"
-                    }}
-                  />
-                </div>
-              </Carousel>
+                <FeaturedProducts isDarkMode={isDarkMode} />
+              </Card>
+              <Card
+                bordered={false}
+                style={{
+                  backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.03)" : "#fff",
+                  borderRadius: "15px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                  marginBottom: 32
+                }}
+              >
+                <TopSoldProducts isDarkMode={isDarkMode} />
+              </Card>
+              <Card
+                bordered={false}
+                style={{
+                  backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.03)" : "#fff",
+                  borderRadius: "15px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                  marginBottom: 32
+                }}
+              >
+                <SaleProducts isDarkMode={isDarkMode} />
+              </Card>
             </motion.div>
           </Col>
         </Row>
 
-        <Space direction="vertical" size="large" style={{ width: "100%" }}>
-          <motion.div {...fadeIn}>
-            <Card
-              title={
-                <Space>
-                  <StarOutlined style={{ color: "#ffd700" }} />
-                  <span style={{ fontSize: "20px", fontWeight: "bold" }}>Featured Products</span>
-                </Space>
-              }
-              bordered={false}
-              style={{
-                backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.05)" : "#fff",
-                borderRadius: "15px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
-              }}
-            >
-              <FeaturedProducts isDarkMode={isDarkMode} />
-            </Card>
-          </motion.div>
-
-          <Divider style={{ 
-            margin: '40px 0',
-            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-            borderWidth: '2px'
-          }} />
-
-          <motion.div {...fadeIn}>
-            <Card
-              title={
-                <Space>
-                  <FireOutlined style={{ color: "#ff4d4f" }} />
-                  <span style={{ fontSize: "20px", fontWeight: "bold" }}>Top Selling Products</span>
-                </Space>
-              }
-              bordered={false}
-              style={{
-                backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.05)" : "#fff",
-                borderRadius: "15px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
-              }}
-            >
-              <TopSoldProducts isDarkMode={isDarkMode} />
-            </Card>
-          </motion.div>
-
-          <Divider style={{ 
-            margin: '40px 0',
-            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-            borderWidth: '2px'
-          }} />
-
-          <motion.div {...fadeIn}>
-            <Card
-              title={
-                <Space>
-                  <ShoppingCartOutlined style={{ color: "#52c41a" }} />
-                  <span style={{ fontSize: "20px", fontWeight: "bold" }}>Sale Products</span>
-                </Space>
-              }
-              bordered={false}
-              style={{
-                backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.05)" : "#fff",
-                borderRadius: "15px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
-              }}
-            >
-              <SaleProducts isDarkMode={isDarkMode} />
-            </Card>
-          </motion.div>
-        </Space>
+        {/* Brand Story Section */}
+        <motion.div {...fadeIn}>
+          <Card
+            bordered={false}
+            style={{
+              background: isDarkMode ? 'linear-gradient(90deg,#1a1a1a,#23272e)' : 'linear-gradient(90deg,#f8fafc,#fff)',
+              borderRadius: 18,
+              margin: '40px 0',
+              boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.25)' : '0 4px 16px rgba(0,0,0,0.08)',
+            }}
+          >
+            <Row align="middle" gutter={[32, 32]}>
+              <Col xs={24} md={12}>
+                <img
+                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80"
+                  alt="Healthy Food"
+                  style={{ width: '100%', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                />
+              </Col>
+              <Col xs={24} md={12}>
+                <Title level={2} style={{ fontWeight: 800, color: isDarkMode ? '#fff' : '#2c3e50' }}>NutiGo Foods - Sống xanh, sống khỏe</Title>
+                <Paragraph style={{ fontSize: 18, color: isDarkMode ? '#bfc9d1' : '#555' }}>
+                  Chúng tôi cam kết mang đến những sản phẩm sạch, an toàn, tốt cho sức khỏe từ thiên nhiên. NutiGo đồng hành cùng bạn trên hành trình sống xanh, sống khỏe mỗi ngày.
+                </Paragraph>
+                <ul style={{ fontSize: 16, color: isDarkMode ? '#e6edf3' : '#333', paddingLeft: 20 }}>
+                  <li>100% nguyên liệu tự nhiên, không chất bảo quản</li>
+                  <li>Được kiểm định chất lượng nghiêm ngặt</li>
+                  <li>Đa dạng sản phẩm cho mọi nhu cầu dinh dưỡng</li>
+                </ul>
+              </Col>
+            </Row>
+          </Card>
+        </motion.div>
 
         {/* Testimonials Section */}
         <motion.div {...fadeIn}>
           <div style={{ marginTop: '60px', marginBottom: '40px' }}>
-            <Title level={2} style={{ textAlign: 'center', marginBottom: '40px' }}>
-              What Our Customers Say
+            <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontWeight: 800 }}>
+              Khách hàng nói gì về NutiGo Foods
             </Title>
-            <Row gutter={[24, 24]}>
+            <Row gutter={[24, 24]} justify="center">
               {testimonials.map((testimonial, index) => (
                 <Col xs={24} md={8} key={index}>
                   <Card
@@ -240,30 +271,33 @@ const Home = () => {
                       background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#fff',
                       borderRadius: '15px',
                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                      height: '100%'
+                      height: '100%',
+                      textAlign: 'center',
+                      padding: 24
                     }}
                   >
-                    <div style={{ textAlign: 'center' }}>
-                      <img
-                        src={testimonial.avatar}
-                        alt={testimonial.name}
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          marginBottom: '16px'
-                        }}
-                      />
-                      <Paragraph style={{ 
-                        fontSize: '1.1rem',
-                        fontStyle: 'italic',
-                        marginBottom: '16px'
-                      }}>
-                        &ldquo;{testimonial.content}&rdquo;
-                      </Paragraph>
-                      <Title level={4} style={{ margin: 0 }}>{testimonial.name}</Title>
-                      <Text type="secondary">{testimonial.role}</Text>
-                    </div>
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '50%',
+                        marginBottom: '16px',
+                        objectFit: 'cover',
+                        border: '3px solid #ffb366'
+                      }}
+                    />
+                    <Paragraph style={{
+                      fontSize: '1.1rem',
+                      fontStyle: 'italic',
+                      marginBottom: '16px',
+                      color: isDarkMode ? '#e6edf3' : '#333'
+                    }}>
+                      &ldquo;{testimonial.content}&rdquo;
+                    </Paragraph>
+                    <Title level={4} style={{ margin: 0 }}>{testimonial.name}</Title>
+                    <Text type="secondary">{testimonial.role}</Text>
                   </Card>
                 </Col>
               ))}
@@ -276,25 +310,26 @@ const Home = () => {
           <Card
             bordered={false}
             style={{
-              background: isDarkMode ? 'linear-gradient(45deg, #1a1a1a, #2d2d2d)' : 'linear-gradient(45deg, #1890ff, #722ed1)',
+              background: isDarkMode ? 'linear-gradient(45deg, #1a1a1a, #2d2d2d)' : 'linear-gradient(45deg, #1890ff, #ffb366)',
               borderRadius: '15px',
               marginTop: '40px',
               marginBottom: '40px',
-              color: '#fff'
+              color: '#fff',
+              boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.25)' : '0 4px 16px rgba(0,0,0,0.08)',
             }}
           >
             <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <ThunderboltOutlined style={{ fontSize: '48px', marginBottom: '20px' }} />
+              <ThunderboltOutlined style={{ fontSize: '48px', marginBottom: '20px', color: '#fff' }} />
               <Title level={3} style={{ color: '#fff', marginBottom: '20px' }}>
-                Subscribe to Our Newsletter
+                Đăng ký nhận bản tin NutiGo
               </Title>
               <Paragraph style={{ color: '#fff', marginBottom: '30px' }}>
-                Get the latest updates on new products and special promotions
+                Nhận thông tin ưu đãi và sản phẩm mới nhất từ NutiGo Foods
               </Paragraph>
               <Space.Compact style={{ width: '100%', maxWidth: '500px' }}>
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Nhập email của bạn"
                   style={{
                     padding: '10px 20px',
                     border: 'none',
@@ -304,7 +339,7 @@ const Home = () => {
                   }}
                 />
                 <Button type="primary" size="large" style={{ borderRadius: '0 5px 5px 0' }}>
-                  Subscribe
+                  Đăng ký
                 </Button>
               </Space.Compact>
             </div>

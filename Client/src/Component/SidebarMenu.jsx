@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Menu } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
+import { AppstoreOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllCategory } from "../service/client/ApiProduct";
+import { getAllCategory } from "../Service/Client/ApiProduct";
 
 const SidebarMenu = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
@@ -24,15 +24,12 @@ const SidebarMenu = () => {
         if (response && Array.isArray(response.categories)) {
           setCategories(response.categories);
         } else {
-          console.error("Invalid categories data:", response);
           setCategories([]);
         }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+      } catch {
         setCategories([]);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -43,21 +40,38 @@ const SidebarMenu = () => {
             const subCategories = category.subCategories || [];
             return {
               key: category._id,
-              label: category.name,
-              icon: <SettingOutlined />,
+              label: (
+                <span style={{ fontWeight: 700, fontSize: 16, color: isDarkMode ? '#a6e22e' : '#189060' }}>{category.name}</span>
+              ),
+              icon: <AppstoreOutlined style={{ color: isDarkMode ? '#ffb366' : '#ff9800', fontSize: 20 }} />,
+              style: {
+                background: isDarkMode ? 'rgba(30,42,60,0.85)' : '#f4f6f9',
+                borderRadius: 10,
+                margin: '4px 0',
+                transition: 'background 0.2s',
+              },
               children:
                 subCategories.length > 0
                   ? subCategories.map((sub, index) => {
                       const subId = sub._id || sub.id || `tmp-${index}`;
-                      if (!sub._id && !sub.id) {
-                        console.warn(
-                          `Subcategory "${sub.name}" is missing _id in category "${category.name}"`
-                        );
-                      }
                       return {
                         key: subId,
-                        label: sub.name || "Unnamed Subcategory",
-                        slug: createSlug(sub.name || "unnamed-subcategory"), // Lưu slug
+                        label: (
+                          <span style={{
+                            fontWeight: 500,
+                            fontSize: 15,
+                            color: isDarkMode ? '#e6edf3' : '#333',
+                            marginLeft: 8,
+                            paddingLeft: 8,
+                            borderLeft: `3px solid ${isDarkMode ? '#ffb366' : '#189060'}`,
+                            transition: 'color 0.2s',
+                          }}>{sub.name || "Unnamed Subcategory"}</span>
+                        ),
+                        style: {
+                          background: isDarkMode ? 'rgba(30,42,60,0.65)' : '#fff',
+                          borderRadius: 8,
+                          margin: '2px 0',
+                        },
                       };
                     })
                   : null,
@@ -68,9 +82,6 @@ const SidebarMenu = () => {
 
   const handleMenuClick = (e) => {
     const selectedSubcategoryId = e.key;
-    console.log("Selected Subcategory ID:", selectedSubcategoryId);
-
-    // Tìm subcategory dựa trên ID
     let selectedSubcategory = null;
     for (const category of categories) {
       selectedSubcategory = category.subCategories.find(
@@ -78,40 +89,47 @@ const SidebarMenu = () => {
       );
       if (selectedSubcategory) break;
     }
-
     if (selectedSubcategory) {
-      const slug = createSlug(
-        selectedSubcategory.name || "unnamed-subcategory"
-      );
+      const slug = createSlug(selectedSubcategory.name || "unnamed-subcategory");
       navigate(`/product-list/${slug}`, {
-        state: { subcategoryId: selectedSubcategoryId }, // Truyền ID qua state
+        state: { subcategoryId: selectedSubcategoryId },
         replace: true,
       });
-    } else {
-      console.warn("Subcategory not found for ID:", selectedSubcategoryId);
     }
   };
 
   return (
-    <Menu
+    <div
       style={{
-        borderRadius: "10px",
-        border: isDarkMode ? "1px solid #3a3f44" : "1px solid #d9d9d9",
-        width: "100%",
-        height: "500px",
-        backgroundColor: isDarkMode ? "#1e2a3c" : "#f4f6f9",
+        borderRadius: 18,
         boxShadow: isDarkMode
-          ? "0 4px 12px rgba(0, 0, 0, 0.4)"
-          : "0 4px 12px rgba(0, 0, 0, 0.1)",
-        padding: "10px 0",
-        transition: "all 0.3s ease",
-        overflow: "auto",
+          ? "0 6px 24px rgba(0,0,0,0.45)"
+          : "0 6px 24px rgba(0,0,0,0.10)",
+        background: isDarkMode ? "linear-gradient(135deg,#1e2a3c 60%,#23272e 100%)" : "linear-gradient(135deg,#f4f6f9 60%,#fff 100%)",
+        padding: 12,
+        marginBottom: 24,
+        minHeight: 420,
+        transition: 'background 0.3s',
       }}
-      mode="vertical"
-      items={items}
-      onClick={handleMenuClick}
-      selectedKeys={[]}
-    />
+    >
+      <Menu
+        style={{
+          borderRadius: 12,
+          border: 'none',
+          width: "100%",
+          background: 'transparent',
+          fontSize: 16,
+          fontWeight: 500,
+          boxShadow: 'none',
+          transition: 'all 0.3s',
+        }}
+        mode="inline"
+        items={items}
+        onClick={handleMenuClick}
+        selectedKeys={[]}
+        itemIcon={<AppstoreOutlined />}
+      />
+    </div>
   );
 };
 

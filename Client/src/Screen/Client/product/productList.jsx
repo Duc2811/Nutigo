@@ -5,110 +5,65 @@ import {
   Col,
   Space,
   Button,
-  Pagination,
-  Input,
+  Card,
+  Modal,
   Select,
   message,
+  Slider,
+  Radio,
+  Popover,
+  Tooltip,
+  Pagination,
 } from "antd";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../../layout/Header";
 import Footer from "../../layout/Footer";
-import ProductCard from "../../../Component/ProductCard";
-import {
-  getAllProduct,
-  getAllProductBySubCategory,
-  getAllCategory,
-} from "../../../Service/Client/ApiProduct";
-import { SearchOutlined } from "@ant-design/icons";
-import BottomAds from "../../../Component/BottomAds"
-import LeftAdsBanner from "../../../Component/LeftAds";
-import RightAdsBanner from "../../../Component/RightAds";
+import { 
+  SwapOutlined, 
+  FilterOutlined,
+  SortAscendingOutlined,
+  DollarOutlined,
+  TagsOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 import CompareProduct from "../../../Component/CompareProduct";
 import { toast } from "react-toastify";
+import { getAllProduct, getAllCategory, getAllProductBySubCategory } from "../../../Service/Client/ApiProduct";
 
 const { Content } = Layout;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const ProductList = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const subcategoryId = searchParams.get('subcategory');
   const isDarkMode = useSelector((state) => state.user.darkMode) || false;
   const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(12);
-  const [totalProducts, setTotalProducts] = useState(0);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isCompareModalVisible, setIsCompareModalVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [subcategories, setSubcategories] = useState([]);
-  const [filterMode, setFilterMode] = useState(null);
-  const { subcategoryName } = useParams();
-  const location = useLocation();
+  const [priceRange, setPriceRange] = useState([0, 10000000]);
+  const [sortBy, setSortBy] = useState('default');
+  const [status, setStatus] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const [totalProducts, setTotalProducts] = useState(0);
   const navigate = useNavigate();
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const handleCompare = (productId) => {
-    if (selectedProducts.length < 2) {
-      setSelectedProducts((prev) => [...prev, productId]);
-    }
-  };
-  const handleCompareRedirect = () => {
-    if (selectedProducts.length === 2) {
-      navigate(`/compare?product1=${selectedProducts[0]}&product2=${selectedProducts[1]}`);
-    } else {
-      toast.error("Chọn đủ 2 sản phẩm để so sánh");
-    }
-  };
-  const createSlug = (name) =>
-    name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
 
-  // Load categories
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getAllCategory();
         if (response && Array.isArray(response.categories)) {
           setCategories(response.categories);
-
-          // Xử lý subcategory từ URL hoặc state
-          const subcategoryIdFromState = location.state?.subcategoryId;
-          if (subcategoryName || subcategoryIdFromState) {
-            let matchedSubcategory = null;
-            let matchedCategory = null;
-
-            for (const cat of response.categories) {
-              matchedSubcategory = cat.subCategories.find(
-                (sub) =>
-                  createSlug(sub.name || "unnamed-subcategory") ===
-                  subcategoryName ||
-                  (sub._id || sub.id) === subcategoryIdFromState
-              );
-              if (matchedSubcategory) {
-                matchedCategory = cat;
-                break;
-              }
-            }
-
-            if (matchedSubcategory && matchedCategory) {
-              setSelectedCategory(matchedCategory._id);
-              setSubcategories(matchedCategory.subCategories);
-              setSelectedSubcategory(
-                matchedSubcategory._id || matchedSubcategory.id
-              );
-            } else {
-              console.warn("Subcategory not found for:", {
-                subcategoryName,
-                subcategoryIdFromState,
-              });
-              message.error("Subcategory not found.");
-            }
-          }
         } else {
           console.error("Invalid categories data:", response);
           setCategories([]);
@@ -122,118 +77,293 @@ const ProductList = () => {
     };
 
     fetchCategories();
-  }, [subcategoryName, location.state]);
+  }, []);
 
-  // Load products
+  // Fetch products based on filters
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProducts = async () => {
       setLoading(true);
       try {
         let data;
-        if (filterMode === "all") {
-          data = await getAllProduct(currentPage);
-        } else if (
-          selectedSubcategory &&
-          /^[0-9a-fA-F]{24}$/.test(selectedSubcategory)
-        ) {
-          data = await getAllProductBySubCategory(
-            selectedSubcategory,
-            currentPage
-          );
+        if (subcategoryId) {
+          data = await getAllProductBySubCategory(subcategoryId);
+          if (data && data.products) {
+            setSelectedSubcategory(subcategoryId);
+            // Find and set the parent category
+            const subcategory = categories.find(cat => 
+              cat.subCategories?.some(sub => sub._id === subcategoryId)
+            );
+            if (subcategory) {
+              setSelectedCategory(subcategory._id);
+            }
+          }
+        } else if (selectedSubcategory) {
+          data = await getAllProductBySubCategory(selectedSubcategory);
+        } else if (selectedCategory && selectedCategory !== 'all') {
+          data = await getAllProduct();
+          if (data && data.products) {
+            data.products = data.products.filter(
+              product => product.category === selectedCategory
+            );
+          }
         } else {
-          data = await getAllProduct(currentPage);
+          data = await getAllProduct();
         }
-        setAllProducts(data?.products || []);
-        setProducts(data?.products || []);
-        setTotalProducts(
-          data?.totalPage * pageSize || data?.products?.length || 0
-        );
+        
+        if (data && data.products) {
+          // Apply price filter
+          let filteredProducts = data.products.filter(
+            product => product.price >= priceRange[0] && product.price <= priceRange[1]
+          );
+
+          // Apply status filter
+          if (status !== 'all') {
+            filteredProducts = filteredProducts.filter(
+              product => product.status === status
+            );
+          }
+
+          // Apply sorting
+          switch (sortBy) {
+            case 'price-asc':
+              filteredProducts.sort((a, b) => a.price - b.price);
+              break;
+            case 'price-desc':
+              filteredProducts.sort((a, b) => b.price - a.price);
+              break;
+            case 'name-asc':
+              filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+              break;
+            case 'name-desc':
+              filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+              break;
+            default:
+              break;
+          }
+
+          setTotalProducts(filteredProducts.length);
+          
+          // Apply pagination
+          const startIndex = (currentPage - 1) * pageSize;
+          const endIndex = startIndex + pageSize;
+          const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+          
+          setProducts(paginatedProducts);
+        } else {
+          throw new Error("Invalid response format");
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
+        toast.error("Lỗi khi tải sản phẩm");
         setProducts([]);
-        setAllProducts([]);
-        setTotalProducts(0);
-        message.error("Failed to load products.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [selectedSubcategory, currentPage, filterMode]);
+    fetchProducts();
+  }, [selectedCategory, selectedSubcategory, priceRange, sortBy, status, currentPage, pageSize, subcategoryId]);
 
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
     setSelectedSubcategory(null);
-    setFilterMode(null);
     const selectedCat = categories.find((cat) => cat._id === value);
     setSubcategories(selectedCat?.subCategories || []);
-    setCurrentPage(1);
   };
 
   const handleSubcategoryChange = (value) => {
     setSelectedSubcategory(value);
-    setFilterMode(null);
-    setCurrentPage(1);
-    // Cập nhật URL với tên subcategory
-    const selectedSub = subcategories.find(
-      (sub) => (sub._id || sub.id) === value
-    );
-    if (selectedSub) {
-      const slug = createSlug(selectedSub.name || "unnamed-subcategory");
-      navigate(`/product-list/${slug}`, {
-        state: { subcategoryId: value },
-        replace: true,
-      });
+  };
+
+  const handlePriceChange = (value) => {
+    setPriceRange(value);
+  };
+
+  const handleSortChange = (value) => {
+    setSortBy(value);
+  };
+
+  const handleStatusChange = (value) => {
+    setStatus(value);
+  };
+
+  const handleCompare = (productId) => {
+    if (selectedProducts.length < 2) {
+      setSelectedProducts((prev) => [...prev, productId]);
+      toast.success("Sản phẩm đã được thêm vào so sánh");
+      setIsCompareModalVisible(true);
+    } else {
+      toast.warning("Bạn chỉ có thể so sánh 2 sản phẩm cùng lúc");
     }
   };
 
-  const handleShowAllProducts = () => {
-    setFilterMode("all");
+  const handleRemoveCompare = (productId) => {
+    setSelectedProducts((prev) => prev.filter(id => id !== productId));
+    toast.info("Sản phẩm đã được xóa khỏi so sánh");
+  };
+
+  const handleCompareRedirect = () => {
+    if (selectedProducts.length === 2) {
+      navigate(`/compare?product1=${selectedProducts[0]}&product2=${selectedProducts[1]}`);
+    } else {
+      toast.error("Vui lòng chọn đủ 2 sản phẩm để so sánh");
+    }
+  };
+
+  const handleClearCompare = () => {
+    setSelectedProducts([]);
+    setIsCompareModalVisible(false);
+    toast.info("Đã xóa tất cả sản phẩm khỏi so sánh");
+  };
+
+  const handleCloseModal = () => {
+    setIsCompareModalVisible(false);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedCategory(null);
     setSelectedSubcategory(null);
-    setCurrentPage(1);
-    navigate("/all-products", { replace: true });
+    setPriceRange([0, 10000000]);
+    setSortBy('default');
+    setStatus('all');
   };
 
-  const handleSearch = () => {
-    setLoading(true);
-    try {
-      let filteredProducts = [...allProducts];
-      if (searchQuery) {
-        filteredProducts = filteredProducts.filter((p) =>
-          p.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-      const startIndex = (currentPage - 1) * pageSize;
-      const paginatedProducts = filteredProducts.slice(
-        startIndex,
-        startIndex + pageSize
-      );
-      setProducts(paginatedProducts);
-      setTotalProducts(filteredProducts.length);
-    } catch (error) {
-      console.error("Error searching products:", error);
-      setProducts([]);
-      setTotalProducts(0);
-      message.error("Failed to search products.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePageChange = (page) => {
+  const handlePageChange = (page, size) => {
     setCurrentPage(page);
-    handleSearch();
+    setPageSize(size);
   };
 
-  const handleSearchQueryChange = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
+  // Filter content components
+  const CategoryFilterContent = (
+    <Card 
+      style={{ 
+        width: 300, 
+        background: isDarkMode ? "#1a1a1a" : "#ffffff",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        borderRadius: "8px",
+      }}
+    >
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Text strong style={{ fontSize: "16px", marginBottom: "8px" }}>Danh mục sản phẩm</Text>
+        <Select
+          placeholder="Chọn danh mục"
+          onChange={handleCategoryChange}
+          value={selectedCategory}
+          style={{ width: "100%" }}
+          allowClear
+        >
+          <Option value="all">Tất cả sản phẩm</Option>
+          {categories.map((category) => (
+            <Option key={category._id} value={category._id}>
+              {category.name}
+            </Option>
+          ))}
+        </Select>
+        <Select
+          placeholder="Chọn danh mục con"
+          onChange={handleSubcategoryChange}
+          value={selectedSubcategory}
+          style={{ width: "100%", marginTop: "8px" }}
+          allowClear
+          disabled={!selectedCategory || selectedCategory === 'all' || subcategories.length === 0}
+        >
+          {subcategories.map((sub) => (
+            <Option key={sub._id} value={sub._id}>
+              {sub.name}
+            </Option>
+          ))}
+        </Select>
+      </Space>
+    </Card>
+  );
 
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
-  };
+  const PriceFilterContent = (
+    <Card 
+      style={{ 
+        width: 300, 
+        background: isDarkMode ? "#1a1a1a" : "#ffffff",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        borderRadius: "8px",
+      }}
+    >
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Text strong style={{ fontSize: "16px", marginBottom: "8px" }}>Khoảng giá</Text>
+        <Slider
+          range
+          min={0}
+          max={10000000}
+          step={100000}
+          value={priceRange}
+          onChange={handlePriceChange}
+          tipFormatter={(value) => `${value.toLocaleString()}đ`}
+          style={{ margin: "16px 0" }}
+        />
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between",
+          padding: "8px 0",
+          borderTop: "1px solid #f0f0f0",
+          marginTop: "8px"
+        }}>
+          <Text>{priceRange[0].toLocaleString()}đ</Text>
+          <Text>{priceRange[1].toLocaleString()}đ</Text>
+        </div>
+      </Space>
+    </Card>
+  );
+
+  const SortFilterContent = (
+    <Card 
+      style={{ 
+        width: 250, 
+        background: isDarkMode ? "#1a1a1a" : "#ffffff",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        borderRadius: "8px",
+      }}
+    >
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Text strong style={{ fontSize: "16px", marginBottom: "8px" }}>Sắp xếp theo</Text>
+        <Radio.Group
+          value={sortBy}
+          onChange={(e) => handleSortChange(e.target.value)}
+        >
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Radio value="default">Mặc định</Radio>
+            <Radio value="price-asc">Giá tăng dần</Radio>
+            <Radio value="price-desc">Giá giảm dần</Radio>
+            <Radio value="name-asc">Tên A-Z</Radio>
+            <Radio value="name-desc">Tên Z-A</Radio>
+          </Space>
+        </Radio.Group>
+      </Space>
+    </Card>
+  );
+
+  const StatusFilterContent = (
+    <Card 
+      style={{ 
+        width: 250, 
+        background: isDarkMode ? "#1a1a1a" : "#ffffff",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        borderRadius: "8px",
+      }}
+    >
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Text strong style={{ fontSize: "16px", marginBottom: "8px" }}>Trạng thái</Text>
+        <Radio.Group
+          value={status}
+          onChange={(e) => handleStatusChange(e.target.value)}
+        >
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Radio value="all">Tất cả</Radio>
+            <Radio value="inStock">Còn hàng</Radio>
+            <Radio value="outOfStock">Hết hàng</Radio>
+            <Radio value="onSale">Đang giảm giá</Radio>
+          </Space>
+        </Radio.Group>
+      </Space>
+    </Card>
+  );
 
   return (
     <Layout
@@ -266,228 +396,255 @@ const ProductList = () => {
             textShadow: isDarkMode ? "0 2px 4px rgba(0,0,0,0.3)" : "none",
           }}
         >
-          Product List
+          So Sánh Sản Phẩm
         </Title>
-        <Row justify="center" style={{ marginBottom: 50 }}>
-          <Col xs={24} sm={20} md={16} lg={12}>
-            <Space
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
-              <Select
-                placeholder="Select a category"
-                onChange={handleCategoryChange}
-                value={selectedCategory}
-                style={{ width: 200, height: 38 }}
-                allowClear
-                dropdownStyle={{
-                  backgroundColor: isDarkMode ? "#2d3748" : "#ffffff",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                }}
-                className="custom-select"
-                popupClassName="custom-select-dropdown"
-                bordered={false}
-              >
-                {Array.isArray(categories) &&
-                  categories.map((category) => (
-                    <Option key={category._id} value={category._id}>
-                      {category.name}
-                    </Option>
-                  ))}
-              </Select>
-              <Select
-                placeholder="Select a subcategory"
-                onChange={handleSubcategoryChange}
-                value={selectedSubcategory}
-                style={{ width: 200, height: 38 }}
-                allowClear
-                disabled={!selectedCategory || subcategories.length === 0}
-                dropdownStyle={{
-                  backgroundColor: isDarkMode ? "#2d3748" : "#ffffff",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                }}
-                className="custom-select"
-                popupClassName="custom-select-dropdown"
-                bordered={false}
-              >
-                {Array.isArray(subcategories) &&
-                  subcategories.map((sub, index) => {
-                    const subId = sub._id || sub.id || `tmp-${index}`;
-                    return (
-                      <Option key={subId} value={subId}>
-                        {sub.name || "Unnamed Subcategory"}
-                      </Option>
-                    );
-                  })}
-              </Select>
-              <Button
-                type={filterMode === "all" ? "primary" : "default"}
-                onClick={handleShowAllProducts}
-                disabled={loading}
-                style={{
-                  height: 38,
-                  borderRadius: "40px",
-                  padding: "0 20px",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  border:
-                    filterMode === "all"
-                      ? "none"
-                      : isDarkMode
-                        ? "1px solid rgba(255,255,255,0.2)"
-                        : "1px solid rgba(0,0,0,0.1)",
-                  background:
-                    filterMode === "all"
-                      ? isDarkMode
-                        ? "linear-gradient(90deg,rgb(231, 39, 145) 0%,rgb(194, 31, 216) 100%)"
-                        : "linear-gradient(90deg,rgb(236, 62, 213) 0%, #3b82f6 100%)"
-                      : isDarkMode
-                        ? "rgba(255,255,255,0.05)"
-                        : "rgba(0,0,0,0.02)",
-                  color:
-                    filterMode === "all"
-                      ? "#ffffff"
-                      : isDarkMode
-                        ? "#e6edf3"
-                        : "#2d3748",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                Show All Products
-              </Button>
-              <Space
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "8px 12px",
-                  background: isDarkMode
-                    ? "rgba(255,255,255,0.12)"
-                    : "rgba(255,255,255,1)",
-                  borderRadius: "40px",
-                  border: isDarkMode
-                    ? "1px solid rgba(255,255,255,0.2)"
-                    : "1px solid rgba(0,0,0,0.1)",
-                  boxShadow: isDarkMode
-                    ? "0 4px 15px rgba(0,0,0,0.3)"
-                    : "0 4px 15px rgba(0,0,0,0.05)",
-                }}
-              >
-                <Input
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={handleSearchQueryChange}
-                  onPressEnter={handleSearch}
-                  prefix={<SearchOutlined />}
-                  style={{
-                    flex: 1,
-                    height: 38,
-                    borderRadius: "40px",
-                    border: "none",
-                    background: isDarkMode
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.02)",
-                    padding: "0 15px",
-                    fontSize: 14,
-                    color: isDarkMode ? "#e6edf3" : "#2d3748",
-                  }}
-                  allowClear
-                />
-                <Button
-                  type="primary"
-                  onClick={handleSearch}
-                  disabled={loading}
-                  style={{
-                    height: 38,
-                    borderRadius: "40px",
-                    padding: "0 20px",
-                    background: isDarkMode
-                      ? "linear-gradient(90deg,rgb(11, 240, 11) 0%,rgb(85, 223, 43) 100%)"
-                      : "linear-gradient(90deg,rgb(23, 213, 219) 0%,rgb(25, 190, 177) 100%)",
-                    border: "none",
-                    fontSize: 14,
-                    fontWeight: 500,
-                    boxShadow: "none",
-                  }}
+
+        {/* Filter Bar */}
+        <Card
+          style={{
+            marginBottom: "24px",
+            background: isDarkMode ? "rgba(255,255,255,0.02)" : "#ffffff",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            position: "sticky",
+            top: "80px",
+            zIndex: 1000,
+          }}
+        >
+          <Row justify="space-between" align="middle">
+            <Col>
+              <Space size="large">
+                <Popover
+                  content={CategoryFilterContent}
+                  trigger="hover"
+                  placement="bottomLeft"
+                  overlayStyle={{ padding: "8px" }}
                 >
-                  {loading ? "Loading..." : "Search"}
-                </Button>
+                  <Button 
+                    type="text" 
+                    icon={<AppstoreOutlined />}
+                    style={{ 
+                      fontSize: "16px",
+                      height: "40px",
+                      padding: "0 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    Danh mục
+                  </Button>
+                </Popover>
+
+                <Popover
+                  content={PriceFilterContent}
+                  trigger="hover"
+                  placement="bottomLeft"
+                  overlayStyle={{ padding: "8px" }}
+                >
+                  <Button 
+                    type="text" 
+                    icon={<DollarOutlined />}
+                    style={{ 
+                      fontSize: "16px",
+                      height: "40px",
+                      padding: "0 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    Khoảng giá
+                  </Button>
+                </Popover>
+
+                <Popover
+                  content={SortFilterContent}
+                  trigger="hover"
+                  placement="bottomLeft"
+                  overlayStyle={{ padding: "8px" }}
+                >
+                  <Button 
+                    type="text" 
+                    icon={<SortAscendingOutlined />}
+                    style={{ 
+                      fontSize: "16px",
+                      height: "40px",
+                      padding: "0 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    Sắp xếp
+                  </Button>
+                </Popover>
+
+                <Popover
+                  content={StatusFilterContent}
+                  trigger="hover"
+                  placement="bottomLeft"
+                  overlayStyle={{ padding: "8px" }}
+                >
+                  <Button 
+                    type="text" 
+                    icon={<TagsOutlined />}
+                    style={{ 
+                      fontSize: "16px",
+                      height: "40px",
+                      padding: "0 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    Trạng thái
+                  </Button>
+                </Popover>
               </Space>
-            </Space>
-          </Col>
-        </Row>
-        <Row gutter={[24, 24]} justify="center">
-          <Col span={24}>
-            <ProductCard
-              products={products || []}
-              loading={loading}
-              onProductClick={handleProductClick}
-            />
-            {!loading && products.length === 0 && (
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: 60,
-                  background: isDarkMode ? "rgba(255,255,255,0.05)" : "#f9f9f9",
-                  borderRadius: 12,
-                }}
-              >
-                <Title
-                  level={4}
+            </Col>
+            <Col>
+              <Tooltip title="Đặt lại bộ lọc">
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={handleResetFilters}
                   style={{
-                    color: isDarkMode ? "#b0b8c1" : "#7f8c8d",
-                    fontWeight: 500,
+                    height: "40px",
+                    padding: "0 16px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
                   }}
                 >
-                  No products found
-                </Title>
-              </div>
-            )}
-          </Col>
-        </Row>
-        {totalProducts > 0 && (
-          <Row justify="center" style={{ marginTop: 50 }}>
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={totalProducts}
-              onChange={handlePageChange}
-              showSizeChanger={false}
-              style={{
-                padding: "10px 20px",
-                background: isDarkMode ? "rgba(255,255,255,0.05)" : "#ffffff",
-                borderRadius: 8,
-              }}
-            />
+                  Đặt lại
+                </Button>
+              </Tooltip>
+            </Col>
           </Row>
-        )}
-        <div>
-          <CompareProduct
-            products={products}
-            loading={loading}
-            isDarkMode={isDarkMode}
-            onCompare={handleCompare}
+        </Card>
+
+        {/* Product List */}
+        <CompareProduct
+          products={products}
+          loading={loading}
+          isDarkMode={isDarkMode}
+          onCompare={handleCompare}
+        />
+
+        {/* Pagination */}
+        <div style={{ 
+          marginTop: "24px", 
+          display: "flex", 
+          justifyContent: "center",
+          padding: "16px 0"
+        }}>
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={totalProducts}
+            onChange={handlePageChange}
+            pageSizeOptions={['8', '16', '24', '32']}
+            style={{
+              background: isDarkMode ? "rgba(255,255,255,0.02)" : "#ffffff",
+              padding: "16px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
           />
-          {selectedProducts.length === 2 && (
-            <Button type="primary" onClick={handleCompareRedirect}>
-              So sánh các sản phẩm đã chọn
-            </Button>
-          )}
         </div>
 
+        {/* Compare Modal */}
+        <Modal
+          title="So Sánh Sản Phẩm"
+          open={isCompareModalVisible}
+          onCancel={handleCloseModal}
+          footer={null}
+          width={800}
+          style={{
+            top: 20,
+          }}
+          bodyStyle={{
+            padding: "24px",
+            background: isDarkMode ? "#1a1a1a" : "#ffffff",
+          }}
+        >
+          <Space direction="vertical" size="large" style={{ width: "100%" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Text strong style={{ fontSize: "16px" }}>
+                Sản phẩm đã chọn để so sánh ({selectedProducts.length}/2)
+              </Text>
+              {selectedProducts.length > 0 && (
+                <Button 
+                  onClick={handleClearCompare}
+                  danger
+                >
+                  Xóa tất cả
+                </Button>
+              )}
+            </div>
+
+            <Row gutter={[16, 16]}>
+              {[0, 1].map((index) => (
+                <Col span={12} key={index}>
+                  <Card
+                    style={{
+                      background: isDarkMode ? "rgba(255,255,255,0.02)" : "#f8f9fa",
+                      border: selectedProducts[index] ? "2px solid #1890ff" : "1px dashed #d9d9d9",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "24px",
+                    }}
+                  >
+                    {selectedProducts[index] ? (
+                      <Space direction="vertical" align="center" style={{ width: "100%" }}>
+                        <Text strong>Đã chọn sản phẩm</Text>
+                        <Button 
+                          type="primary" 
+                          danger
+                          onClick={() => handleRemoveCompare(selectedProducts[index])}
+                        >
+                          Xóa sản phẩm
+                        </Button>
+                      </Space>
+                    ) : (
+                      <Space direction="vertical" align="center">
+                        <SwapOutlined style={{ fontSize: "32px", color: "#bfbfbf" }} />
+                        <Text type="secondary">Chọn sản phẩm để so sánh</Text>
+                      </Space>
+                    )}
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+            {selectedProducts.length === 2 && (
+              <div style={{ textAlign: "center", marginTop: "16px" }}>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handleCompareRedirect}
+                  icon={<SwapOutlined />}
+                  style={{
+                    background: isDarkMode
+                      ? "linear-gradient(90deg,rgb(231, 39, 145) 0%,rgb(194, 31, 216) 100%)"
+                      : "linear-gradient(90deg,rgb(236, 62, 213) 0%, #3b82f6 100%)",
+                    border: "none",
+                    height: "48px",
+                    padding: "0 32px",
+                    fontSize: "16px",
+                  }}
+                >
+                  So sánh sản phẩm
+                </Button>
+              </div>
+            )}
+          </Space>
+        </Modal>
       </Content>
       <Footer />
-      <BottomAds />
-      <LeftAdsBanner />
-      <RightAdsBanner />
     </Layout>
   );
 };
