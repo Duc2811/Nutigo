@@ -33,8 +33,8 @@ yarn-error.*
 .env*.local
 server/.env
 .env
-
-<<<<<<< HEAD
+.serviceAccountKey
+server/src/config/serviceAccountKey
 # typescript
 default.json
 

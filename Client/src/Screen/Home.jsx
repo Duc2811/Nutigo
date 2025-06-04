@@ -7,6 +7,7 @@ import {
   CustomerServiceOutlined,
   GlobalOutlined,
   ThunderboltOutlined,
+  MessageOutlined,
 } from '@ant-design/icons';
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
@@ -22,11 +23,15 @@ import RightAdsBanner from "../Component/RightAds";
 import Banner1 from "../assets/Slider/banner1.jpg";
 import Banner2 from "../assets/Slider/baner2.jpg";
 import Banner3 from "../assets/Slider/banner3.jpg";
+import Chatbox from "../Component/Chatbox/Chatbox";
+import { useState } from "react";
+
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 const Home = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -96,6 +101,25 @@ const Home = () => {
           margin: "auto",
         }}
       >
+        {/* Chat Button */}
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<MessageOutlined />}
+          size="large"
+          style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            zIndex: 1000,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          }}
+          onClick={() => setIsChatOpen(true)}
+        />
+
+        {/* Chat Modal */}
+        <Chatbox isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+
         {/* Hero Banner */}
         <motion.div {...fadeIn}>
           <div
