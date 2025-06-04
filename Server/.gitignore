@@ -34,7 +34,8 @@ yarn-error.*
 server/.env
 .env
 .serviceAccountKey
-server/src/config/serviceAccountKey
+Server/Src/config/serviceAccountKey.json
+
 # typescript
 default.json
 
