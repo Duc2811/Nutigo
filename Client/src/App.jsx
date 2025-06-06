@@ -70,7 +70,7 @@ import SearchProduct from "./Screen/Client/product/searchProduct";
 
 import LuckyWheel from "./Screen/discount/luckWheel";
 import CompareProducts from "./Screen/Client/product/compareProducts";
-
+import Contact from "./Screen/Client/contact/Contact";
 import DiscountDashboard from "./Screen/Admin/discount/discountDashboard";
 import DiscountStatistics from "./Screen/Admin/discount/discountStatistics";
 import CreateDiscount from "./Screen/Admin/discount/createDiscount";
@@ -82,6 +82,7 @@ import UserDiscount from "./Screen/Admin/discount/userDiscount";
 import ShiperLayout from "./Screen/Shiper/ShiperLayout";
 
 import GoogleCallback from './Screen/Client/GoogleCallback';
+import About from "./Screen/Client/contact/About";
 
 const App = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
@@ -109,7 +110,6 @@ const App = () => {
         <Router>
           <Routes>
             {/* duc */}
-
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -118,6 +118,8 @@ const App = () => {
             <Route path="/verify" element={<VerifyScreen />} />
             <Route path="/otp/:email" element={<Otp />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About/>} />
             <Route path="/cart">
               <Route index element={<Cart />} />
               <Route path="checkout" element={<Checkout />} />
@@ -164,12 +166,17 @@ const App = () => {
               <Route path="manage-ads" element={<AdsController />} />
               {/* discount */}
               <Route path="manage-discount" element={<DiscountDashboard />} />
-              <Route path="discountStatistics" element={<DiscountStatistics />} />
+              <Route
+                path="discountStatistics"
+                element={<DiscountStatistics />}
+              />
               <Route path="createDiscount" element={<CreateDiscount />} />
-              <Route path="updateDiscount/:discountId" element={<UpdateDiscount />} />
+              <Route
+                path="updateDiscount/:discountId"
+                element={<UpdateDiscount />}
+              />
               <Route path="userDiscount" element={<UserDiscount />} />
             </Route>
-
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:id" element={<BlogDetail />} />
             {/* tuan */}
@@ -183,10 +190,8 @@ const App = () => {
             <Route path="/sale/update" element={<UpdateSaleScreen />} />
             <Route path="/sale/orders" element={<SaleOrderManagement />} />
             <Route path="/product-sale/:id" element={<ProductSaleDetail />} />;
-
             <Route path="/sale/dashboard" element={<SaleScreen />} />
             {/* end */}
-
             {/* Ship */}
             {/* <Route path="/shipper" element={<ShiperDashboard />} /> */}
             <Route path="/shipper/login" element={<ShiperLogin />} />
@@ -200,8 +205,6 @@ const App = () => {
             >
               <Route index element={<OrderManagementShiper />} />
             </Route>
-
-
             <Route path="/luckywheel" element={<LuckyWheel />} />
             <Route path="/compare" element={<CompareProducts />} />
             <Route path="/google-callback" element={<GoogleCallback />} />
