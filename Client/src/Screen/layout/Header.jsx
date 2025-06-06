@@ -24,6 +24,8 @@ import {
   HomeOutlined,
   ShopOutlined,
   BookOutlined,
+  ContactsOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import { getAllCategory } from "../../Service/Client/ApiProduct";
 
@@ -97,6 +99,8 @@ const Header = () => {
   const handleHome = () => navigate("/home");
   const handleProduct = () => navigate("/all-products");
   const handleBlog = () => navigate("/blog");
+   const handleContact = () => navigate("/contact");
+   const handleAbout = () => navigate("/about");
 
   // Xác định tab hiện tại dựa trên đường dẫn
   const getSelectedKey = () => {
@@ -237,7 +241,7 @@ const Header = () => {
             cursor: "pointer",
             paddingTop: "15px",
             borderRadius: "8px",
-            width: '120px',
+            width: "120px",
             transition: "transform 0.3s ease",
           }}
           onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
@@ -286,6 +290,22 @@ const Header = () => {
           style={{ color: isDarkMode ? "#fff" : "#fff" }}
         >
           {t("Blog")}
+        </Menu.Item>
+        <Menu.Item
+          key="contact"
+          icon={<ContactsOutlined />}
+          onClick={handleContact}
+          style={{ color: isDarkMode ? "#fff" : "#fff" }}
+        >
+          {t("Contact")}
+        </Menu.Item>
+        <Menu.Item
+          key="about"
+          icon={<AppstoreOutlined/>}
+          onClick={handleAbout}
+          style={{ color: isDarkMode ? "#fff" : "#fff" }}
+        >
+          {t("About")}
         </Menu.Item>
       </Menu>
 

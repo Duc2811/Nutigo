@@ -39,6 +39,9 @@ app.use(cors({
     credentials: true
 }));
 
+const chatRoute = require("./api/routes/client/chatRoute");
+app.use("/api/client", chatRoute);
+
 require('./api/controllers/admin/discountScheduler');
 
 routeClient(app)
